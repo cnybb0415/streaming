@@ -2,25 +2,38 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #000000;
+  --surface: color-mix(in oklab, var(--background) 92%, var(--foreground));
+  /* Translucent surface layers for overlays on top of wallpaper */
+  --surface-80: color-mix(in oklab, var(--surface) 80%, transparent);
+  --surface-90: color-mix(in oklab, var(--surface) 90%, transparent);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* keep consistent high-contrast text regardless of OS theme */
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "NanumBarunGothic", var(--font-sans), ui-sans-serif, system-ui,
+    -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+}
+
+/* Nanum Barun Gothic family names are split by weight in the provided CSS */
+h1,
+h2,
+h3,
+strong,
+b {
+  font-family: "NanumBarunGothicBold", "NanumBarunGothic", var(--font-sans),
+    ui-sans-serif, system-ui;
 }

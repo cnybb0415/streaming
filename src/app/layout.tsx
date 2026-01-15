@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
+import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -23,12 +24,42 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const wallpaperSrc = siteConfig.assets.wallpaper.src?.trim();
+  const overlayOpacity = siteConfig.assets.wallpaper.overlayOpacity;
+
   return (
     <html lang="ko">
+      <head>
+        <link rel="preconnect" href="https://hangeul.pstatic.net" />
+        <link
+          href="https://hangeul.pstatic.net/hangeul_static/css/nanum-barun-gothic.css"
+          rel="stylesheet"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        {wallpaperSrc ? (
+          <>
+            <div
+              aria-hidden
+              className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${wallpaperSrc})` }}
+            />
+            <div
+              aria-hidden
+              className="fixed inset-0 z-0 bg-background"
+              style={{
+                opacity:
+                  typeof overlayOpacity === "number" ? overlayOpacity : 0.9,
+              }}
+            />
+          </>
+        ) : null}
+        <div className={wallpaperSrc ? "relative z-10" : undefined}>
+          <SiteHeader />
+          {children}
+        </div>
       </body>
     </html>
   );

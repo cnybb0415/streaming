@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { siteConfig } from "@/config/site";
 
 type YouTubeStats = {
   viewCount: number;
   likeCount: number;
   fetchedAt: string;
+  videoId?: string;
 };
 
 function getRequiredEnv(name: string): string {
@@ -14,10 +16,23 @@ function getRequiredEnv(name: string): string {
   return value;
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const apiKey = getRequiredEnv("YOUTUBE_API_KEY");
-    const videoId = getRequiredEnv("YOUTUBE_VIDEO_ID");
+
+    const { searchParams } = new URL(request.url);
+    const queryVideoId = searchParams.get("videoId")?.trim();
+
+    // Priority: explicit query param > current site config > env fallback (backward compatibility)
+    const videoId =
+      queryVideoId || siteConfig.youtube.videoId?.trim() || process.env.YOUTUBE_VIDEO_ID;
+
+    if (!videoId) {
+      return NextResponse.json(
+        { error: "Missing videoId (set siteConfig.youtube.videoId or pass ?videoId=)" },
+        { status: 400 }
+      );
+    }
 
     const url = new URL("https://www.googleapis.com/youtube/v3/videos");
     url.searchParams.set("part", "statistics");
@@ -67,6 +82,7 @@ export async function GET() {
       viewCount: Number.isFinite(viewCount) ? viewCount : 0,
       likeCount: Number.isFinite(likeCount) ? likeCount : 0,
       fetchedAt: new Date().toISOString(),
+      videoId,
     };
 
     return NextResponse.json(body);

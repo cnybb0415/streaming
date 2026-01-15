@@ -1,8 +1,10 @@
 import localCharts from "@/data/charts.json";
 
-type ChartItem = {
+export type ChartItem = {
   label: string;
-  status: string;
+  status?: string;
+  rank?: number;
+  prevRank?: number;
 };
 
 export type ChartsData = {
@@ -17,8 +19,25 @@ function isChartsData(value: unknown): value is ChartsData {
   if (!Array.isArray(data.items)) return false;
   return data.items.every((item) => {
     if (!item || typeof item !== "object") return false;
-    const i = item as { label?: unknown; status?: unknown };
-    return typeof i.label === "string" && typeof i.status === "string";
+    const i = item as {
+      label?: unknown;
+      status?: unknown;
+      rank?: unknown;
+      prevRank?: unknown;
+    };
+
+    if (typeof i.label !== "string") return false;
+
+    const hasValidStatus = i.status === undefined || typeof i.status === "string";
+    const hasValidRank = i.rank === undefined || typeof i.rank === "number";
+    const hasValidPrevRank =
+      i.prevRank === undefined || typeof i.prevRank === "number";
+
+    // Must have at least one displayable field.
+    const hasAnyDisplay =
+      typeof i.status === "string" || typeof i.rank === "number";
+
+    return hasValidStatus && hasValidRank && hasValidPrevRank && hasAnyDisplay;
   });
 }
 

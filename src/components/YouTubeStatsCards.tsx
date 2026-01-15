@@ -2,6 +2,8 @@
 
 import * as React from "react";
 import { formatCompactNumber } from "@/lib/format";
+import { Card, CardContent } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type YouTubeStats = {
   viewCount: number;
@@ -63,36 +65,46 @@ export function YouTubeStatsCards() {
     return () => controller.abort();
   }, []);
 
-  const viewText =
-    state.status === "ready"
-      ? formatCompactNumber(state.data.viewCount)
-      : state.status === "error"
-        ? "불러오기 실패"
-        : "불러오는 중…";
-
-  const likeText =
-    state.status === "ready"
-      ? formatCompactNumber(state.data.likeCount)
-      : state.status === "error"
-        ? "불러오기 실패"
-        : "불러오는 중…";
+  const ready = state.status === "ready";
+  const errored = state.status === "error";
 
   return (
     <div className="mt-5 grid gap-3 sm:grid-cols-2">
-      <div className="rounded-xl bg-foreground/5 p-4">
-        <div className="text-sm text-foreground/70">YouTube 조회수</div>
-        <div className="mt-1 text-xl font-semibold">{viewText}</div>
-        {state.status === "error" && (
-          <div className="mt-2 text-xs text-foreground/70">{state.message}</div>
-        )}
-      </div>
-      <div className="rounded-xl bg-foreground/5 p-4">
-        <div className="text-sm text-foreground/70">YouTube 좋아요</div>
-        <div className="mt-1 text-xl font-semibold">{likeText}</div>
-        {state.status === "error" && (
-          <div className="mt-2 text-xs text-foreground/70">{state.message}</div>
-        )}
-      </div>
+      <Card>
+        <CardContent className="p-4">
+          <div className="text-sm text-foreground">조회수</div>
+          <div className="mt-1 text-xl font-semibold">
+            {ready ? (
+              formatCompactNumber(state.data.viewCount)
+            ) : errored ? (
+              "불러오기 실패"
+            ) : (
+              <Skeleton className="mt-1 h-7 w-28" />
+            )}
+          </div>
+          {errored && (
+            <div className="mt-2 text-xs text-foreground">{state.message}</div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="p-4">
+          <div className="text-sm text-foreground">좋아요</div>
+          <div className="mt-1 text-xl font-semibold">
+            {ready ? (
+              formatCompactNumber(state.data.likeCount)
+            ) : errored ? (
+              "불러오기 실패"
+            ) : (
+              <Skeleton className="mt-1 h-7 w-24" />
+            )}
+          </div>
+          {errored && (
+            <div className="mt-2 text-xs text-foreground">{state.message}</div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

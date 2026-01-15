@@ -39,3 +39,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# local runtime caches
+.cache/
+
+# local dev dependency repo (not part of this app)
+korea-music-chart-api/

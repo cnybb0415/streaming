@@ -3,6 +3,7 @@ export const siteConfig = {
   description: "원클릭 링크, 바로가기, 차트 현황을 한 화면에.",
   artistName: "EXO",
   trackTitle: "첫 눈",
+  tagline: "EXO SUPPORTING FANBASE",
   releaseDate: "",
 
   links: {
@@ -22,7 +23,7 @@ export const siteConfig = {
     // Optional: full-page background wallpaper
     wallpaper: {
       // Example: "/images/wallpaper/main.jpg"
-      src: "/images/wallpaper/main.jpg",
+      src: "",
       // 0~1, higher = more white overlay (better readability)
       overlayOpacity: 0.2,
     },
@@ -37,10 +38,12 @@ export const siteConfig = {
   },
 
   actions: [
-    { label: "원클릭 스트리밍", href: "#" },
+    { label: "멜론x 스트리밍", href: "#", kind: "streamingModal" },
+    { label: "REVERXE 앨범구매", href: "#", kind: "albumModal" },
     { label: "라디오 신청하기", href: "#" },
     { label: "생방송 문자투표", href: "sms:%230505?body=VOTE_TEXT" },
-    { label: "REVERXE 앨범구매", href: "#" },
+    { label: "응원 가이드", href: "/guide" },
+    { label: "응원법", href: "/links" },
   ] as const,
 
   streamingLinks: [
@@ -85,6 +88,7 @@ export const siteConfig = {
 
   contacts: {
     twitterUrl: "#",
+    instagramUrl: "#",
     devEmail: "dev@example.com",
     teamEmail: "team@example.com",
   },

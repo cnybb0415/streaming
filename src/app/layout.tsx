@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
-import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -57,7 +56,6 @@ export default function RootLayout({
           </>
         ) : null}
         <div className={wallpaperSrc ? "relative z-10" : undefined}>
-          <SiteHeader />
           {children}
         </div>
       </body>

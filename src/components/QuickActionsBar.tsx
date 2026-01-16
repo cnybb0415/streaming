@@ -3,10 +3,12 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 export type QuickAction = {
   label: string;
   href: string;
+  kind?: "streamingModal" | "albumModal";
 };
 
 export type QuickLink = {
@@ -19,9 +21,21 @@ type ModalType = "streaming" | "album";
 export function QuickActionsBar({
   actions,
   albumLinks,
+  containerVariant = "card",
+  containerClassName,
+  gridClassName,
+  buttonVariant = "outline",
+  buttonSize,
+  buttonClassName,
 }: {
   actions: ReadonlyArray<QuickAction>;
   albumLinks?: ReadonlyArray<QuickLink>;
+  containerVariant?: "card" | "none";
+  containerClassName?: string;
+  gridClassName?: string;
+  buttonVariant?: React.ComponentProps<typeof Button>["variant"];
+  buttonSize?: React.ComponentProps<typeof Button>["size"];
+  buttonClassName?: string;
 }) {
   const [openModal, setOpenModal] = React.useState<ModalType | null>(null);
 
@@ -46,60 +60,75 @@ export function QuickActionsBar({
   const openAlbumModal = () => setOpenModal("album");
   const closeModal = () => setOpenModal(null);
 
+  const gridClasses = cn(
+    "grid",
+    gridClassName ?? "grid-cols-2 gap-2 sm:grid-cols-4"
+  );
+
+  const buttons = (
+    <div className={gridClasses}>
+      {actions.map((action) => {
+        const legacyStreaming = action.label.trim() === "원클릭 스트리밍";
+        const legacyAlbum = action.label.trim() === "REVERXE 앨범구매";
+        const isStreaming = action.kind === "streamingModal" || legacyStreaming;
+        const isAlbum = action.kind === "albumModal" || legacyAlbum;
+
+        const shared = {
+          variant: buttonVariant,
+          size: buttonSize,
+          className: cn("w-full", buttonClassName),
+        } as const;
+
+        if (isStreaming) {
+          return (
+            <Button
+              key={action.label}
+              {...shared}
+              onClick={openStreamingModal}
+            >
+              {action.label}
+            </Button>
+          );
+        }
+
+        if (isAlbum) {
+          return (
+            <Button
+              key={action.label}
+              {...shared}
+              onClick={openAlbumModal}
+            >
+              {action.label}
+            </Button>
+          );
+        }
+
+        const isExternal = action.href.startsWith("http") || action.href.startsWith("sms:");
+
+        return (
+          <a
+            key={action.label}
+            href={action.href}
+            target={isExternal && action.href.startsWith("http") ? "_blank" : undefined}
+            rel={isExternal && action.href.startsWith("http") ? "noopener noreferrer" : undefined}
+            className="w-full"
+          >
+            <Button {...shared}>{action.label}</Button>
+          </a>
+        );
+      })}
+    </div>
+  );
+
   return (
     <>
-      <Card className="rounded-2xl">
-        <CardContent className="p-3">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {actions.map((action) => {
-              const isStreaming = action.label.trim() === "원클릭 스트리밍";
-              const isAlbum = action.label.trim() === "REVERXE 앨범구매";
-
-              if (isStreaming) {
-                return (
-                  <Button
-                    key={action.label}
-                    variant="outline"
-                    className="w-full rounded-xl"
-                    onClick={openStreamingModal}
-                  >
-                    {action.label}
-                  </Button>
-                );
-              }
-
-              if (isAlbum) {
-                return (
-                  <Button
-                    key={action.label}
-                    variant="outline"
-                    className="w-full rounded-xl"
-                    onClick={openAlbumModal}
-                  >
-                    {action.label}
-                  </Button>
-                );
-              }
-
-              const isExternal = action.href.startsWith("http") || action.href.startsWith("sms:");
-
-              return (
-                <a
-                  key={action.label}
-                  href={action.href}
-                  target={isExternal && action.href.startsWith("http") ? "_blank" : undefined}
-                  rel={isExternal && action.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  className="w-full"
-                >
-                  <Button variant="outline" className="w-full rounded-xl">
-                    {action.label}
-                  </Button>
-                </a>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      {containerVariant === "card" ? (
+        <Card className={cn("rounded-2xl", containerClassName)}>
+          <CardContent className="p-3">{buttons}</CardContent>
+        </Card>
+      ) : (
+        <div className={containerClassName}>{buttons}</div>
+      )}
 
       {openModal ? (
         <div className="fixed inset-0 z-50">

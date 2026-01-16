@@ -1,12 +1,13 @@
 @import "tailwindcss";
 
 :root {
+  /* Screenshot-like theme (light background + dark foreground) */
   --background: #ffffff;
-  --foreground: #000000;
-  --surface: color-mix(in oklab, var(--background) 92%, var(--foreground));
+  --foreground: #111827;
+  --surface: color-mix(in oklab, var(--background) 92%, #111827 8%);
   /* Translucent surface layers for overlays on top of wallpaper */
   --surface-80: color-mix(in oklab, var(--surface) 80%, transparent);
-  --surface-90: color-mix(in oklab, var(--surface) 90%, transparent);
+  --surface-90: color-mix(in oklab, var(--surface) 92%, transparent);
 }
 
 @theme inline {

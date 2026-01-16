@@ -12,6 +12,20 @@ export type ChartsData = {
   items: ChartItem[];
 };
 
+function toAbsoluteUrl(url: string): string {
+  const trimmed = url.trim();
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) return trimmed;
+
+  const baseFromEnv =
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
+    "http://localhost:3000";
+
+  const base = baseFromEnv.replace(/\/+$/, "");
+  const path = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  return `${base}${path}`;
+}
+
 function isChartsData(value: unknown): value is ChartsData {
   if (!value || typeof value !== "object") return false;
   const data = value as { lastUpdated?: unknown; items?: unknown };
@@ -43,12 +57,10 @@ function isChartsData(value: unknown): value is ChartsData {
 
 export async function getChartsData(): Promise<ChartsData> {
   const overrideUrl = process.env.CHARTS_JSON_URL;
-  if (!overrideUrl) {
-    return localCharts as ChartsData;
-  }
+  const url = overrideUrl ? toAbsoluteUrl(overrideUrl) : toAbsoluteUrl("/api/charts");
 
   try {
-    const response = await fetch(overrideUrl, { next: { revalidate: 60 } });
+    const response = await fetch(url, { next: { revalidate: 60 } });
     if (!response.ok) return localCharts as ChartsData;
 
     const json = (await response.json()) as unknown;

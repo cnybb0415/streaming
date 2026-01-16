@@ -47,12 +47,25 @@ export function QuickActionsBar({
     };
 
     document.addEventListener("keydown", onKeyDown);
+    const root = document.documentElement;
     const previousOverflow = document.body.style.overflow;
+    const previousData = root.getAttribute("data-scroll-locked");
+    const previousVar = root.style.getPropertyValue("--scrollbar-width");
+
+    // Prevent layout shift when the scrollbar disappears.
+    const scrollbarWidth = window.innerWidth - root.clientWidth;
+    root.style.setProperty("--scrollbar-width", `${Math.max(0, scrollbarWidth)}px`);
+    root.setAttribute("data-scroll-locked", "true");
+
     document.body.style.overflow = "hidden";
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
+      if (previousData === null) root.removeAttribute("data-scroll-locked");
+      else root.setAttribute("data-scroll-locked", previousData);
+      if (previousVar) root.style.setProperty("--scrollbar-width", previousVar);
+      else root.style.removeProperty("--scrollbar-width");
     };
   }, [openModal]);
 

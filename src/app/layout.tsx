@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { siteConfig } from "@/config/site";
+import { SiteFooterNav } from "@/components/SiteFooterNav";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -15,7 +16,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: siteConfig.title,
-  description: siteConfig.description,
+  description: "원클릭 링크, 바로가기, 차트 현황을 한 화면에.",
 };
 
 export default function RootLayout({
@@ -55,8 +56,15 @@ export default function RootLayout({
             />
           </>
         ) : null}
-        <div className={wallpaperSrc ? "relative z-10" : undefined}>
-          {children}
+        <div
+          className={
+            wallpaperSrc
+              ? "relative z-10 min-h-screen bg-transparent"
+              : "min-h-screen bg-transparent"
+          }
+        >
+          <div className="pb-24">{children}</div>
+          <SiteFooterNav />
         </div>
       </body>
     </html>

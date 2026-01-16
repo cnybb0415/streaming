@@ -23,7 +23,7 @@ export default function StreamingPage() {
                     target={action.href.startsWith("http") ? "_blank" : undefined}
                     rel={action.href.startsWith("http") ? "noopener noreferrer" : undefined}
                   >
-                    <Button variant="outline" className="rounded-full">
+                    <Button variant="outline" className="rounded-2xl">
                       {action.label}
                     </Button>
                   </a>

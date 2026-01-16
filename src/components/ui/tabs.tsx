@@ -66,7 +66,7 @@ export function TabsList({
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        "flex flex-wrap items-center gap-2 rounded-2xl border border-foreground/10 bg-[var(--surface-80)] p-2 backdrop-blur [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "flex flex-wrap items-center gap-2 rounded-2xl border border-foreground/10 bg-white p-2 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         className
       )}
     >
@@ -130,7 +130,7 @@ export function TabsTrigger({
         variant === "pill" &&
           (selected
             ? "bg-foreground text-background"
-            : "bg-transparent text-foreground hover:bg-[var(--surface-90)]"),
+            : "bg-transparent text-foreground hover:bg-gray-50"),
 
         variant === "underline" &&
           "h-10 rounded-none border-b-2 px-1 font-semibold",
@@ -143,8 +143,8 @@ export function TabsTrigger({
           "h-10 w-full justify-start rounded-xl px-3 font-semibold",
         variant === "sidebar" &&
           (selected
-            ? "bg-[var(--surface-90)] text-foreground"
-            : "bg-transparent text-foreground/80 hover:bg-[var(--surface-80)] hover:text-foreground"),
+            ? "bg-gray-50 text-foreground"
+            : "bg-transparent text-foreground/80 hover:bg-gray-50 hover:text-foreground"),
         className
       )}
     >

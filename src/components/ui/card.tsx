@@ -5,7 +5,7 @@ export function Card({ className, ...props }: React.HTMLAttributes<HTMLDivElemen
   return (
     <div
       className={cn(
-        "rounded-xl border border-foreground/10 bg-[var(--surface-90)] backdrop-blur",
+        "rounded-2xl border border-foreground/10 bg-white shadow-sm",
         className
       )}
       {...props}

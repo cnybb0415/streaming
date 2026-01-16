@@ -20,6 +20,19 @@
 
 /* keep consistent high-contrast text regardless of OS theme */
 
+/* Prevent width shift between pages that do/do not scroll. */
+@supports (scrollbar-gutter: stable) {
+  html {
+    scrollbar-gutter: stable;
+  }
+}
+
+@supports not (scrollbar-gutter: stable) {
+  html {
+    overflow-y: scroll;
+  }
+}
+
 html,
 body {
   background: var(--background);
@@ -27,6 +40,14 @@ body {
   font-family: "NanumBarunGothic", var(--font-sans), ui-sans-serif, system-ui,
     -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
     "Segoe UI Emoji";
+}
+
+html[data-scroll-locked="true"] body {
+  padding-right: var(--scrollbar-width, 0px);
+}
+
+html[data-scroll-locked="true"] .scroll-lock-pad {
+  padding-right: var(--scrollbar-width, 0px);
 }
 
 /* Nanum Barun Gothic family names are split by weight in the provided CSS */

@@ -1,7 +1,8 @@
 "use client";
 
+import * as React from "react";
+
 import {
-  cheeringGuideSongs,
   streamingGuideServices,
   type GuideAsset,
   type StreamingGuideService,
@@ -9,6 +10,75 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { MusicServiceIcon, resolveMusicServiceIdFromLabel } from "@/components/MusicServiceIcon";
+
+function uniqueStrings(values: string[]) {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const v of values) {
+    if (!v) continue;
+    if (seen.has(v)) continue;
+    seen.add(v);
+    out.push(v);
+  }
+  return out;
+}
+
+function expandExtensionCandidates(url: string) {
+  const m = url.match(/^(.*)\.(png|jpg|jpeg|webp)$/i);
+  if (!m) return [url];
+  const base = m[1];
+  return [
+    `${base}.png`,
+    `${base}.jpg`,
+    `${base}.jpeg`,
+    `${base}.webp`,
+  ];
+}
+
+function GuideImage({
+  src,
+  fallbackSrcs,
+  alt,
+  missingLines,
+}: {
+  src: string;
+  fallbackSrcs?: string[];
+  alt: string;
+  missingLines: string[];
+}) {
+  const candidates = React.useMemo(() => {
+    const raw = [src, ...(fallbackSrcs ?? [])];
+    return uniqueStrings(raw.flatMap(expandExtensionCandidates));
+  }, [src, fallbackSrcs]);
+
+  const [index, setIndex] = React.useState(0);
+  const current = candidates[index];
+
+  if (!current) {
+    return (
+      <div className="rounded-2xl border border-foreground/10 bg-white p-4 text-sm text-foreground/80">
+        <div className="font-semibold">가이드 이미지를 찾을 수 없어요.</div>
+        <div className="mt-2 space-y-1 text-xs">
+          {missingLines.map((line, idx) => (
+            <div key={idx}>{line}</div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img
+      src={current}
+      alt={alt}
+      className="h-auto w-full"
+      loading="lazy"
+      onError={() => setIndex((prev) => prev + 1)}
+    />
+  );
+}
 
 function EmptyState({
   title,
@@ -26,7 +96,7 @@ function EmptyState({
         <p className="text-sm text-foreground/80">
           아직 업로드된 가이드가 없어요.
         </p>
-        <div className="rounded-xl border border-foreground/10 bg-[var(--surface-80)] p-3 text-xs text-foreground/80">
+        <div className="rounded-xl border border-foreground/10 bg-white p-3 text-xs text-foreground/80 shadow-sm">
           <div className="font-semibold">업로드 방법</div>
           <div className="mt-1 space-y-1">
             {lines.map((line, idx) => (
@@ -79,14 +149,13 @@ function Assets({
           return (
             <div
               key={`${idKey}-img-${idx}`}
-              className="overflow-hidden rounded-2xl border border-foreground/10 bg-[var(--surface-80)]"
+              className="overflow-hidden rounded-2xl border border-foreground/10 bg-white"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
+              <GuideImage
                 src={asset.src}
+                fallbackSrcs={asset.fallbackSrcs}
                 alt={asset.alt ?? `${title} 이미지 ${idx + 1}`}
-                className="h-auto w-full"
-                loading="lazy"
+                missingLines={emptyLines}
               />
             </div>
           );
@@ -102,19 +171,33 @@ function StreamingServiceTabs({ service }: { service: StreamingGuideService }) {
 
   return (
     <Tabs defaultValue={defaultPart}>
-      <div className="mt-4 grid gap-4 md:grid-cols-[220px_minmax(0,1fr)]">
-        <div>
-          <div className="mb-2 text-sm font-semibold text-foreground/80">항목</div>
-          <TabsList aria-label={`${service.label} 항목`} className="flex flex-col gap-1 rounded-2xl p-2">
-            {service.parts.map((part) => (
-              <TabsTrigger key={part.id} value={part.id} variant="sidebar">
-                {part.label}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+      <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start">
+        <div className="md:w-[220px] md:shrink-0 md:self-stretch">
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-sm font-semibold text-foreground/80">항목</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <TabsList
+                aria-label={`${service.label} 항목`}
+                className="flex flex-nowrap items-center gap-1 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none md:flex-col md:items-stretch md:overflow-visible"
+              >
+                {service.parts.map((part) => (
+                  <TabsTrigger
+                    key={part.id}
+                    value={part.id}
+                    variant="sidebar"
+                    className="w-auto whitespace-nowrap md:w-full"
+                  >
+                    {part.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </CardContent>
+          </Card>
         </div>
 
-        <div className="min-w-0">
+        <div className="min-w-0 md:flex-1">
           {service.parts.map((part) => (
             <TabsContent key={part.id} value={part.id} className="mt-0">
               <Assets
@@ -122,9 +205,10 @@ function StreamingServiceTabs({ service }: { service: StreamingGuideService }) {
                 idKey={`streaming-${service.id}-${part.id}`}
                 assets={part.assets}
                 emptyLines={[
-                  `1) 파일을 public/guides/streaming/${service.id}/${part.id}/ 아래에 넣기`,
+                  `1) 파일을 public/images/guides/${service.id}/${part.id === "signup" ? "idcreate" : part.id}/ 아래에 넣기`,
                   `2) src/data/guides.ts 에서 ${service.label} > ${part.label} assets에 경로 추가`,
-                  `예시: /guides/streaming/${service.id}/${part.id}/guide-1.png`,
+                  `파일명 규칙: ${service.id}_${part.id === "signup" ? "idcreate" : part.id}.png (또는 .jpg)`,
+                  `예시: /images/guides/${service.id}/${part.id === "signup" ? "idcreate" : part.id}/${service.id}_${part.id === "signup" ? "idcreate" : part.id}.png`,
                 ]}
               />
             </TabsContent>
@@ -151,10 +235,18 @@ function StreamingTabs() {
   return (
     <Tabs defaultValue={defaultService}>
       <div className="border-b border-foreground/10 pb-2">
-        <TabsList aria-label="스트리밍 사이트" className="gap-6 rounded-none border-0 bg-transparent p-0">
+        <TabsList
+          aria-label="스트리밍 사이트"
+          className="w-full flex-nowrap justify-start gap-6 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none"
+        >
           {services.map((service) => (
             <TabsTrigger key={service.id} value={service.id} variant="underline">
-              {service.label}
+              <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                {resolveMusicServiceIdFromLabel(service.label) ? (
+                  <MusicServiceIcon label={service.label} size={16} className="h-4 w-4" />
+                ) : null}
+                <span>{service.label}</span>
+              </span>
             </TabsTrigger>
           ))}
         </TabsList>
@@ -169,81 +261,10 @@ function StreamingTabs() {
   );
 }
 
-function CheeringTabs() {
-  const songs = cheeringGuideSongs;
-  const defaultSong = songs[0]?.id ?? "";
-
-  if (!songs.length) {
-    return (
-      <EmptyState
-        title="응원법 가이드"
-        lines={[
-          "1) 파일을 public/guides/cheering/<song-id>/ 아래에 넣기",
-          "2) src/data/guides.ts 의 cheeringGuideSongs에 곡을 추가",
-          "예시: /guides/cheering/first-snow/guide-1.png",
-        ]}
-      />
-    );
-  }
-
-  return (
-    <Tabs defaultValue={defaultSong}>
-      <div className="mt-4 grid gap-4 md:grid-cols-[220px_minmax(0,1fr)]">
-        <div>
-          <div className="mb-2 text-sm font-semibold text-foreground/80">곡</div>
-          <TabsList aria-label="응원법 곡" className="flex flex-col gap-1 rounded-2xl p-2">
-            {songs.map((song) => (
-              <TabsTrigger key={song.id} value={song.id} variant="sidebar">
-                {song.label} 응원법
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
-
-        <div className="min-w-0">
-          {songs.map((song) => (
-            <TabsContent key={song.id} value={song.id} className="mt-0">
-              <Assets
-                title={`${song.label} 응원법`}
-                idKey={`cheering-${song.id}`}
-                assets={song.assets}
-                emptyLines={[
-                  `1) 파일을 public/guides/cheering/${song.id}/ 아래에 넣기`,
-                  `2) src/data/guides.ts 에서 ${song.label} assets에 경로 추가`,
-                  `예시: /guides/cheering/${song.id}/guide-1.png`,
-                ]}
-              />
-            </TabsContent>
-          ))}
-        </div>
-      </div>
-    </Tabs>
-  );
-}
-
 export function GuideTabs() {
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="streaming">
-        <div className="border-b border-foreground/10 pb-2">
-          <TabsList aria-label="가이드 종류" className="gap-8 rounded-none border-0 bg-transparent p-0">
-            <TabsTrigger value="streaming" variant="underline">
-              스트리밍 가이드
-            </TabsTrigger>
-            <TabsTrigger value="cheering" variant="underline">
-              응원법 가이드
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="streaming">
-          <StreamingTabs />
-        </TabsContent>
-
-        <TabsContent value="cheering">
-          <CheeringTabs />
-        </TabsContent>
-      </Tabs>
+      <StreamingTabs />
     </div>
   );
 }

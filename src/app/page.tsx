@@ -2,74 +2,9 @@ import { siteConfig } from "@/config/site";
 import { getChartsData } from "@/lib/charts";
 import { YouTubeStatsCards } from "@/components/YouTubeStatsCards";
 import { QuickActionsBar } from "@/components/QuickActionsBar";
+import { ChartSummaryGrid } from "@/components/ChartSummaryGrid";
 import Image from "next/image";
 import type { ReactNode } from "react";
-
-function getStatusMeta(status: string): {
-  variant: "default" | "success" | "danger";
-  icon: string;
-} {
-  const s = status.trim();
-  if (
-    s.includes("없") ||
-    s.includes("실패") ||
-    s.includes("오류") ||
-    s.includes("미진입") ||
-    s === "❌"
-  ) {
-    return { variant: "danger", icon: "❌" };
-  }
-  if (s === "UP" || s.includes("상승")) return { variant: "success", icon: "▲" };
-  if (s === "DOWN" || s.includes("하락")) return { variant: "danger", icon: "▼" };
-  if (s === "NEW" || s.includes("진입") || s.includes("성공")) {
-    return { variant: "success", icon: "NEW" };
-  }
-  if (s === "-" || s.includes("유지") || s.includes("동결")) {
-    return { variant: "default", icon: "-" };
-  }
-  return { variant: "default", icon: "•" };
-}
-
-function toChartTokenFromLegacyStatus(status: string): string {
-  const s = status.trim();
-  if (s.length === 0) return "❌";
-  if (s.includes("미진입") || s.includes("없") || s.includes("실패") || s.includes("오류")) {
-    return "❌";
-  }
-  if (s.includes("진입") || s.includes("성공")) return "NEW";
-  if (s.includes("상승")) return "UP";
-  if (s.includes("하락")) return "DOWN";
-  if (s.includes("유지") || s.includes("동결")) return "-";
-  return "•";
-}
-
-function formatChartDisplay(item: {
-  status?: string;
-  rank?: number;
-  prevRank?: number;
-}): { badgeText: string; detailText: string } {
-  const status = (item.status ?? "").trim();
-
-  if (typeof item.rank !== "number") {
-    const fallback = status.length > 0 ? status : "차트 데이터가 없습니다";
-    return { badgeText: toChartTokenFromLegacyStatus(fallback), detailText: fallback };
-  }
-
-  const rankText = `#${item.rank}`;
-  // Some providers (ex: Melon) may not provide change info; treat as “-” (frozen/unknown)
-  // rather than “NEW”.
-  if (typeof item.prevRank !== "number" || item.prevRank === item.rank) {
-    return { badgeText: "-", detailText: `${rankText} · -` };
-  }
-
-  if (item.prevRank > item.rank) {
-    const diff = item.prevRank - item.rank;
-    return { badgeText: "UP", detailText: `${rankText} · UP (+${diff})` };
-  }
-
-  const diff = item.rank - item.prevRank;
-  return { badgeText: "DOWN", detailText: `${rankText} · DOWN (-${diff})` };
-}
 
 function SocialIcon({ children }: { children: ReactNode }) {
   return (
@@ -149,23 +84,6 @@ function XIcon() {
   );
 }
 
-function providerDot(label: string) {
-  const text = label.trim();
-  const color =
-    text.includes("멜론")
-      ? "bg-emerald-500"
-      : text.includes("지니")
-        ? "bg-sky-500"
-        : text.includes("벅스")
-          ? "bg-rose-500"
-          : text.includes("바이브")
-            ? "bg-fuchsia-500"
-            : text.includes("플로")
-              ? "bg-indigo-500"
-              : "bg-zinc-400";
-  return <span className={`h-2.5 w-2.5 rounded-full ${color}`} aria-hidden />;
-}
-
 export default async function Home() {
   const charts = await getChartsData();
 
@@ -203,11 +121,8 @@ export default async function Home() {
               width={520}
               height={150}
               priority
-              className="h-auto w-[min(460px,100%)]"
+              className="mt-[5px] h-auto w-[min(460px,100%)]"
             />
-            <div className="mt-2 text-[11px] tracking-[0.35em] text-foreground/60">
-              {siteConfig.tagline}
-            </div>
 
             <div className="mt-8 w-full max-w-md">
               <QuickActionsBar
@@ -217,44 +132,46 @@ export default async function Home() {
                 gridClassName="grid-cols-2 gap-3"
                 buttonVariant="outline"
                 buttonSize="lg"
-                buttonClassName="h-12 rounded-full border-foreground/20 bg-[var(--surface-90)] text-foreground shadow-sm hover:bg-[var(--surface-80)]"
+                buttonClassName="h-12 rounded-2xl"
               />
             </div>
 
-            <div className="mt-7 flex items-center justify-center gap-5 lg:justify-start">
-              <a
-                href={siteConfig.contacts.instagramUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="text-foreground/80 hover:text-foreground"
-              >
-                <SocialIcon>
-                  <InstagramIcon />
-                </SocialIcon>
-              </a>
-              <a
-                href={siteConfig.youtube.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="text-foreground/80 hover:text-foreground"
-              >
-                <SocialIcon>
-                  <YouTubeIcon />
-                </SocialIcon>
-              </a>
-              <a
-                href={siteConfig.contacts.twitterUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="X"
-                className="text-foreground/80 hover:text-foreground"
-              >
-                <SocialIcon>
-                  <XIcon />
-                </SocialIcon>
-              </a>
+            <div className="mt-7 w-full max-w-md">
+              <div className="flex items-center justify-center gap-5">
+                <a
+                  href={siteConfig.contacts.instagramUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="text-foreground/80 hover:text-foreground"
+                >
+                  <SocialIcon>
+                    <InstagramIcon />
+                  </SocialIcon>
+                </a>
+                <a
+                  href={siteConfig.youtube.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="text-foreground/80 hover:text-foreground"
+                >
+                  <SocialIcon>
+                    <YouTubeIcon />
+                  </SocialIcon>
+                </a>
+                <a
+                  href={siteConfig.contacts.twitterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="X"
+                  className="text-foreground/80 hover:text-foreground"
+                >
+                  <SocialIcon>
+                    <XIcon />
+                  </SocialIcon>
+                </a>
+              </div>
             </div>
           </div>
         </section>
@@ -262,47 +179,7 @@ export default async function Home() {
         <div className="mt-10 border-t border-foreground/10" />
 
         <section className="mt-8 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-sky-500/10 text-sky-700" aria-hidden>
-              ▣
-            </span>
-            <h2 className="text-base font-semibold">실시간 차트 현황</h2>
-          </div>
-
-          <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {charts.items.map((item) => {
-              const display = formatChartDisplay(item);
-              const meta = getStatusMeta(display.badgeText);
-
-              return (
-                <div
-                  key={item.label}
-                  className="rounded-xl border border-foreground/10 bg-white p-5 shadow-sm"
-                >
-                  <div className="flex items-center gap-2 text-sm font-semibold">
-                    {providerDot(item.label)}
-                    <span className="truncate">{item.label}</span>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-center gap-2 text-sm text-foreground/70">
-                    <span>{display.detailText}</span>
-                    <span
-                      className={
-                        meta.variant === "danger"
-                          ? "text-rose-600"
-                          : meta.variant === "success"
-                            ? "text-emerald-600"
-                            : "text-foreground/50"
-                      }
-                      aria-hidden
-                    >
-                      {meta.icon}
-                    </span>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <ChartSummaryGrid trackTitle={siteConfig.trackTitle} charts={charts} />
         </section>
       </main>
     </div>

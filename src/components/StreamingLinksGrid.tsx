@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
+import { MusicServiceIcon, resolveMusicServiceIdFromLabel } from "@/components/MusicServiceIcon";
 
 export type StreamingLink = {
   label: string;
@@ -50,6 +51,7 @@ export function StreamingLinksGrid({
     <div className={`grid ${columnsClassName}`}>
       {effectiveLinks.map((linkItem) => {
         const href = isMobile ? linkItem.mobileHref : linkItem.pcHref;
+        const serviceId = resolveMusicServiceIdFromLabel(linkItem.label);
         return (
           <a
             key={linkItem.label}
@@ -59,7 +61,17 @@ export function StreamingLinksGrid({
             className="w-full"
           >
             <Button variant={buttonVariant} className="w-full">
-              {linkItem.label}
+              <span className="inline-flex items-center gap-2">
+                {serviceId ? (
+                  <MusicServiceIcon
+                    service={serviceId}
+                    label={linkItem.label}
+                    size={18}
+                    className="h-[18px] w-[18px]"
+                  />
+                ) : null}
+                <span>{linkItem.label}</span>
+              </span>
             </Button>
           </a>
         );

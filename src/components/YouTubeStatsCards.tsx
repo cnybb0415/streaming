@@ -74,10 +74,10 @@ export function YouTubeStatsCards({
 
   if (variant === "inline") {
     return (
-      <div className="flex items-center justify-between gap-6 border-t border-foreground/10 px-1 pt-3 text-sm">
-        <div className="flex items-center gap-2">
+      <div className="grid grid-cols-2 items-center gap-3 border-t border-foreground/10 px-1 pt-3 text-sm">
+        <div className="flex items-center justify-center gap-2 text-center">
           <span className="text-foreground/60">조회수</span>
-          <span className="font-semibold">
+          <span className="font-semibold tabular-nums">
             {ready ? (
               formatCompactNumber(state.data.viewCount)
             ) : errored ? (
@@ -87,9 +87,9 @@ export function YouTubeStatsCards({
             )}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-center gap-2 text-center">
           <span className="text-foreground/60">좋아요</span>
-          <span className="font-semibold">
+          <span className="font-semibold tabular-nums">
             {ready ? (
               formatCompactNumber(state.data.likeCount)
             ) : errored ? (

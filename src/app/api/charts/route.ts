@@ -37,6 +37,15 @@ function normalizeText(value: unknown): string {
   return value.trim().toLowerCase();
 }
 
+function normalizeComparable(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value
+    .normalize("NFKC")
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "");
+}
+
 function computePrevRank(entry: ProviderEntry, rank: number): number | undefined {
   const rankStatus = normalizeText(entry.rankStatus);
   const changedRank = toNumber(entry.changedRank) ?? 0;
@@ -91,18 +100,30 @@ async function writeChartsCache(data: ChartsData): Promise<void> {
   await writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
 }
 
-function getNextTopOfHour(now: Date): Date {
-  const next = new Date(now);
-  next.setMinutes(0, 0, 0);
-  next.setHours(next.getHours() + 1);
-  return next;
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+function getKstTopOfHourIso(now: Date): string {
+  // KST has a fixed UTC+9 offset (no DST). We compute the KST-local top-of-hour
+  // and convert back to an ISO timestamp.
+  const kstMs = now.getTime() + KST_OFFSET_MS;
+  const flooredKstMs = kstMs - (kstMs % (60 * 60 * 1000));
+  const utcMs = flooredKstMs - KST_OFFSET_MS;
+  return new Date(utcMs).toISOString();
+}
+
+function getNextKstTopOfHour(now: Date): Date {
+  const kstMs = now.getTime() + KST_OFFSET_MS;
+  const flooredKstMs = kstMs - (kstMs % (60 * 60 * 1000));
+  const nextKstMs = flooredKstMs + 60 * 60 * 1000;
+  const utcMs = nextKstMs - KST_OFFSET_MS;
+  return new Date(utcMs);
 }
 
 function isStaleForHourlyRefresh(lastUpdatedIso: string, now: Date): boolean {
   const last = new Date(lastUpdatedIso);
   if (Number.isNaN(last.getTime())) return true;
-  // Refresh once we cross the next top-of-hour boundary after lastUpdated.
-  return now.getTime() >= getNextTopOfHour(last).getTime();
+  // Refresh once we cross a new KST top-of-hour boundary.
+  return getKstTopOfHourIso(now) !== getKstTopOfHourIso(last);
 }
 
 function pickTrackEntry(
@@ -111,16 +132,24 @@ function pickTrackEntry(
   trackTitle: string
 ): ProviderEntry | undefined {
   const artistNorm = normalizeText(artistName);
-  const trackNorm = normalizeText(trackTitle);
+  const artistKey = normalizeComparable(artistName);
+  const trackKey = normalizeComparable(trackTitle);
 
   const byTrack = entries.filter((e) => {
-    const title = normalizeText(e.title);
-    if (!title) return false;
-    return title === trackNorm || title.includes(trackNorm) || trackNorm.includes(title);
+    if (!trackKey) return false;
+    const titleKey = normalizeComparable(e.title);
+    if (!titleKey) return false;
+    return titleKey === trackKey || titleKey.includes(trackKey) || trackKey.includes(titleKey);
   });
 
-  const scoped = byTrack.length
-    ? byTrack
+  const byTrackAndArtist = byTrack.filter((e) => {
+    if (!artistKey) return false;
+    const entryArtistKey = normalizeComparable(e.artistName);
+    return entryArtistKey.includes(artistKey);
+  });
+
+  const scoped = (byTrackAndArtist.length ? byTrackAndArtist : byTrack).length
+    ? (byTrackAndArtist.length ? byTrackAndArtist : byTrack)
     : entries.filter((e) => {
         const artist = normalizeText(e.artistName);
         return artistNorm.length > 0 && artist.includes(artistNorm);
@@ -136,7 +165,7 @@ async function fetchChartsAndPersist(
   const baseUrl = process.env.KOREA_MUSIC_CHART_API_BASE_URL;
   if (!baseUrl) {
     const data: ChartsData = {
-      lastUpdated: new Date().toISOString(),
+      lastUpdated: getKstTopOfHourIso(new Date()),
       items: [
         {
           label: "차트",
@@ -155,19 +184,43 @@ async function fetchChartsAndPersist(
   });
 
   const platforms = [
-    { key: "melon", label: "멜론 TOP100" },
-    { key: "genie", label: "지니" },
-    { key: "bugs", label: "벅스" },
-    { key: "vibe", label: "바이브" },
+    {
+      label: "멜론 TOP100",
+      buildEndpoint: (base: string) =>
+        `${base}/melon/chart/${encodeURIComponent(artistName)}`,
+    },
+    {
+      label: "멜론 HOT100 100일",
+      buildEndpoint: (base: string) =>
+        `${base}/melon/hot100/D100/chart/${encodeURIComponent(artistName)}`,
+    },
+    {
+      label: "멜론 HOT100 30일",
+      buildEndpoint: (base: string) =>
+        `${base}/melon/hot100/D30/chart/${encodeURIComponent(artistName)}`,
+    },
+    {
+      label: "지니 TOP200",
+      buildEndpoint: (base: string) =>
+        `${base}/genie/chart/${encodeURIComponent(artistName)}`,
+    },
+    {
+      label: "벅스 실시간",
+      buildEndpoint: (base: string) =>
+        `${base}/bugs/chart/${encodeURIComponent(artistName)}`,
+    },
+    {
+      label: "바이브 국내 급상승",
+      buildEndpoint: (base: string) =>
+        `${base}/vibe/chart/${encodeURIComponent(artistName)}`,
+    },
   ] as const;
 
   const results: Array<ChartItem | null> = new Array(platforms.length).fill(null);
 
   await Promise.all(
     platforms.map(async (platform, index) => {
-      const endpoint = `${baseUrl.replace(/\/+$/, "")}/${platform.key}/chart/${encodeURIComponent(
-        artistName
-      )}`;
+      const endpoint = platform.buildEndpoint(baseUrl.replace(/\/+$/, ""));
 
       let response: Response;
       try {
@@ -197,7 +250,7 @@ async function fetchChartsAndPersist(
       const rank = match ? toNumber(match.rank) : undefined;
 
       if (typeof rank !== "number") {
-        results[index] = { label: platform.label, status: "TOP100 미진입" };
+        results[index] = { label: platform.label, status: "차트 미진입" };
         return;
       }
 
@@ -213,8 +266,12 @@ async function fetchChartsAndPersist(
 
   const items = results.filter((item): item is ChartItem => item !== null);
 
+  // Placeholders for UI cards we don't currently support via backend.
+  items.push({ label: "멜론 실시간", status: "준비중" });
+  items.push({ label: "플로 실시간", status: "준비중" });
+
   const data: ChartsData = {
-    lastUpdated: new Date().toISOString(),
+    lastUpdated: getKstTopOfHourIso(new Date()),
     items,
   };
 
@@ -242,7 +299,7 @@ function ensureHourlyBackgroundRefreshStarted(): void {
   };
 
   const now = new Date();
-  const delayMs = Math.max(0, getNextTopOfHour(now).getTime() - now.getTime());
+  const delayMs = Math.max(0, getNextKstTopOfHour(now).getTime() - now.getTime());
   setTimeout(() => {
     void tick();
     setInterval(() => void tick(), 1000 * 60 * 60);
@@ -280,7 +337,7 @@ export async function GET(request: Request): Promise<Response> {
   } catch {
     // Keep the API shape stable even if something unexpected happens.
     const data: ChartsData = {
-      lastUpdated: new Date().toISOString(),
+      lastUpdated: getKstTopOfHourIso(new Date()),
       items: [
         {
           label: "차트",

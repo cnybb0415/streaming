@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/button";
+import logoPng from "@/../public/images/logo.png";
 
 export function SiteHeader() {
   return (
@@ -9,7 +10,7 @@ export function SiteHeader() {
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center">
           <Image
-            src="/images/logo.png"
+            src={logoPng}
             alt={`${siteConfig.artistName} 스트리밍`}
             width={220}
             height={56}

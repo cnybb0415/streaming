@@ -5,6 +5,7 @@ import { QuickActionsBar } from "@/components/QuickActionsBar";
 import { ChartSummaryGrid } from "@/components/ChartSummaryGrid";
 import Image from "next/image";
 import type { ReactNode } from "react";
+import logoPng from "@/../public/images/logo.png";
 
 function SocialIcon({ children }: { children: ReactNode }) {
   return (
@@ -116,18 +117,19 @@ export default async function Home() {
           {/* Right: logo + actions */}
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             <Image
-              src="/images/logo.png"
+              src={logoPng}
               alt={siteConfig.title}
               width={520}
               height={150}
               priority
-              className="mt-[5px] h-auto w-[min(460px,100%)]"
+              className="mt-[15px] h-auto w-[min(460px,100%)]"
             />
 
             <div className="mt-8 w-full max-w-md">
               <QuickActionsBar
                 actions={siteConfig.actions}
                 albumLinks={siteConfig.albumPurchaseLinks}
+                oneClickStreamingLinks={siteConfig.oneClickStreamingLinks}
                 containerVariant="none"
                 gridClassName="grid-cols-2 gap-3"
                 buttonVariant="outline"

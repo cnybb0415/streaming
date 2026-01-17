@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { StreamingLinksGrid } from "@/components/StreamingLinksGrid";
+import { QuickActionsBar } from "@/components/QuickActionsBar";
 
 export default function LinksPage() {
   return (
@@ -21,20 +22,15 @@ export default function LinksPage() {
               <CardTitle>원클릭 바로가기</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {siteConfig.actions.map((action) => (
-                  <a
-                    key={action.label}
-                    href={action.href}
-                    target={action.href.startsWith("http") ? "_blank" : undefined}
-                    rel={action.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                  >
-                    <Button variant="outline" className="rounded-2xl">
-                      {action.label}
-                    </Button>
-                  </a>
-                ))}
-              </div>
+              <QuickActionsBar
+                actions={siteConfig.actions}
+                albumLinks={siteConfig.albumPurchaseLinks}
+                oneClickStreamingLinks={siteConfig.oneClickStreamingLinks}
+                containerVariant="none"
+                gridClassName="grid-cols-2 gap-2 sm:grid-cols-3"
+                buttonVariant="outline"
+                buttonClassName="rounded-2xl"
+              />
             </CardContent>
           </Card>
 

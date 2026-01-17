@@ -4,11 +4,15 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { OneClickStreamingGrid, type OneClickStreamingLink } from "@/components/OneClickStreamingGrid";
+import { buildSmsHref, detectSmsPlatform } from "@/lib/sms";
 
 export type QuickAction = {
   label: string;
   href: string;
-  kind?: "streamingModal" | "albumModal";
+  kind?: "streamingModal" | "albumModal" | "smsVote";
+  smsTo?: string;
+  smsBody?: string;
 };
 
 export type QuickLink = {
@@ -21,6 +25,7 @@ type ModalType = "streaming" | "album";
 export function QuickActionsBar({
   actions,
   albumLinks,
+  oneClickStreamingLinks,
   containerVariant = "card",
   containerClassName,
   gridClassName,
@@ -30,6 +35,7 @@ export function QuickActionsBar({
 }: {
   actions: ReadonlyArray<QuickAction>;
   albumLinks?: ReadonlyArray<QuickLink>;
+  oneClickStreamingLinks?: ReadonlyArray<OneClickStreamingLink>;
   containerVariant?: "card" | "none";
   containerClassName?: string;
   gridClassName?: string;
@@ -39,7 +45,15 @@ export function QuickActionsBar({
 }) {
   const [openModal, setOpenModal] = React.useState<ModalType | null>(null);
 
-  React.useEffect(() => {
+  const openSmsVote = React.useCallback((action: QuickAction) => {
+    const smsTo = (action.smsTo ?? "0505").trim();
+    const bodyText = action.smsBody ?? "";
+    const platform = detectSmsPlatform();
+    const href = buildSmsHref({ to: smsTo, body: bodyText, platform });
+    window.location.href = href;
+  }, []);
+
+  React.useLayoutEffect(() => {
     if (!openModal) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -49,19 +63,32 @@ export function QuickActionsBar({
     document.addEventListener("keydown", onKeyDown);
     const root = document.documentElement;
     const previousOverflow = document.body.style.overflow;
+    const previousRootOverflow = root.style.overflow;
     const previousData = root.getAttribute("data-scroll-locked");
     const previousVar = root.style.getPropertyValue("--scrollbar-width");
 
-    // Prevent layout shift when the scrollbar disappears.
-    const scrollbarWidth = window.innerWidth - root.clientWidth;
-    root.style.setProperty("--scrollbar-width", `${Math.max(0, scrollbarWidth)}px`);
+    // Compute compensation BEFORE locking scroll so layout doesn't jump.
+    // If `scrollbar-gutter: stable` is supported, the gutter already prevents width shifts,
+    // so applying extra padding can cause a noticeable jitter.
+    const hasStableScrollbarGutter =
+      typeof CSS !== "undefined" &&
+      typeof CSS.supports === "function" &&
+      CSS.supports("scrollbar-gutter: stable");
+
+    const scrollbarWidth = hasStableScrollbarGutter
+      ? 0
+      : Math.max(0, window.innerWidth - root.clientWidth);
+
+    root.style.setProperty("--scrollbar-width", `${scrollbarWidth}px`);
     root.setAttribute("data-scroll-locked", "true");
 
+    root.style.overflow = "hidden";
     document.body.style.overflow = "hidden";
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
+      root.style.overflow = previousRootOverflow;
       if (previousData === null) root.removeAttribute("data-scroll-locked");
       else root.setAttribute("data-scroll-locked", previousData);
       if (previousVar) root.style.setProperty("--scrollbar-width", previousVar);
@@ -85,6 +112,7 @@ export function QuickActionsBar({
         const legacyAlbum = action.label.trim() === "REVERXE 앨범구매";
         const isStreaming = action.kind === "streamingModal" || legacyStreaming;
         const isAlbum = action.kind === "albumModal" || legacyAlbum;
+        const isSmsVote = action.kind === "smsVote";
 
         const shared = {
           variant: buttonVariant,
@@ -111,6 +139,14 @@ export function QuickActionsBar({
               {...shared}
               onClick={openAlbumModal}
             >
+              {action.label}
+            </Button>
+          );
+        }
+
+        if (isSmsVote) {
+          return (
+            <Button key={action.label} {...shared} onClick={() => openSmsVote(action)}>
               {action.label}
             </Button>
           );
@@ -144,7 +180,7 @@ export function QuickActionsBar({
       )}
 
       {openModal ? (
-        <div className="fixed inset-0 z-50">
+        <div className="fixed inset-0 z-40">
           <button
             aria-label="닫기"
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
@@ -168,23 +204,19 @@ export function QuickActionsBar({
 
             {openModal === "streaming" ? (
               <>
-
-                <div className="mt-4 grid grid-cols-3 gap-2">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <Button
-                      key={i}
-                      variant="secondary"
-                      className="h-11"
-                      onClick={closeModal}
-                    >
-                      스트리밍{i + 1}
-                    </Button>
-                  ))}
-                </div>
-
-                <div className="mt-4 text-xs text-foreground/70">
-                  예시용 모달
-                </div>
+                {oneClickStreamingLinks && oneClickStreamingLinks.length > 0 ? (
+                  <div className="mt-4">
+                    <OneClickStreamingGrid
+                      links={oneClickStreamingLinks}
+                      columnsClassName="grid-cols-2 gap-2 sm:grid-cols-3"
+                      buttonVariant="secondary"
+                    />
+                  </div>
+                ) : (
+                  <div className="mt-4 rounded-xl border border-foreground/10 bg-white p-3 text-sm text-foreground/70">
+                    원클릭 스트리밍 링크 준비중
+                  </div>
+                )}
               </>
             ) : (
               <>

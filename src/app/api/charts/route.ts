@@ -17,6 +17,7 @@ type ProviderEntry = {
 
 type ChartsCacheFile = {
   lastUpdated: string;
+  fetchedAt?: string;
   items: Array<{ label: string; status?: string; rank?: number; prevRank?: number }>;
 };
 
@@ -63,7 +64,7 @@ function getCacheFilePath(): string {
   return path.join(process.cwd(), ".cache", "charts-cache.json");
 }
 
-async function readChartsCache(): Promise<ChartsData | null> {
+async function readChartsCache(): Promise<(ChartsData & { fetchedAt?: string }) | null> {
   const filePath = getCacheFilePath();
   try {
     const raw = await readFile(filePath, "utf8");
@@ -87,6 +88,7 @@ async function readChartsCache(): Promise<ChartsData | null> {
 
     return {
       lastUpdated: data.lastUpdated,
+      fetchedAt: typeof data.fetchedAt === "string" ? data.fetchedAt : undefined,
       items,
     };
   } catch {
@@ -97,7 +99,33 @@ async function readChartsCache(): Promise<ChartsData | null> {
 async function writeChartsCache(data: ChartsData): Promise<void> {
   const filePath = getCacheFilePath();
   await mkdir(path.dirname(filePath), { recursive: true });
-  await writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+  const payload: ChartsCacheFile = {
+    ...data,
+    fetchedAt: new Date().toISOString(),
+  };
+  await writeFile(filePath, JSON.stringify(payload, null, 2), "utf8");
+}
+
+function hasTransientFailure(items: ChartItem[]): boolean {
+  return items.some((item) => {
+    const status = typeof item.status === "string" ? item.status : "";
+    return (
+      status.includes("서버 연결 실패") ||
+      status.includes("연동 실패") ||
+      status.includes("응답 파싱 실패")
+    );
+  });
+}
+
+function hasDeprecatedPlaceholders(items: ChartItem[]): boolean {
+  return items.some((item) => {
+    const label = typeof item.label === "string" ? item.label.trim() : "";
+    const status = typeof item.status === "string" ? item.status.trim() : "";
+    return (
+      label === "플로 실시간" ||
+      (label.includes("플로") && status === "준비중")
+    );
+  });
 }
 
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
@@ -210,6 +238,11 @@ async function fetchChartsAndPersist(
         `${base}/bugs/chart/${encodeURIComponent(artistName)}`,
     },
     {
+      label: "플로 24시간",
+      buildEndpoint: (base: string) =>
+        `${base}/flo/chart/${encodeURIComponent(artistName)}`,
+    },
+    {
       label: "바이브 국내 급상승",
       buildEndpoint: (base: string) =>
         `${base}/vibe/chart/${encodeURIComponent(artistName)}`,
@@ -266,10 +299,6 @@ async function fetchChartsAndPersist(
 
   const items = results.filter((item): item is ChartItem => item !== null);
 
-  // Placeholders for UI cards we don't currently support via backend.
-  items.push({ label: "멜론 실시간", status: "준비중" });
-  items.push({ label: "플로 실시간", status: "준비중" });
-
   const data: ChartsData = {
     lastUpdated: getKstTopOfHourIso(new Date()),
     items,
@@ -320,7 +349,24 @@ export async function GET(request: Request): Promise<Response> {
     const cached = await readChartsCache();
     const now = new Date();
 
-    if (!force && cached && !isStaleForHourlyRefresh(cached.lastUpdated, now)) {
+    // If the last fetch had transient failures, retry more aggressively so the UI
+    // recovers quickly after the backend comes back up.
+    const fetchedAtMs = cached?.fetchedAt ? new Date(cached.fetchedAt).getTime() : NaN;
+    const allowQuickRetry =
+      cached &&
+      Number.isFinite(fetchedAtMs) &&
+      hasTransientFailure(cached.items) &&
+      now.getTime() - fetchedAtMs >= 60_000;
+
+    const mustRefreshForSchema = cached ? hasDeprecatedPlaceholders(cached.items) : false;
+
+    if (
+      !force &&
+      cached &&
+      !mustRefreshForSchema &&
+      !allowQuickRetry &&
+      !isStaleForHourlyRefresh(cached.lastUpdated, now)
+    ) {
       return Response.json(cached, {
         headers: {
           "cache-control": "no-store",

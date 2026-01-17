@@ -6,4 +6,7 @@ services:
     plan: free
     buildCommand: chmod +x mvnw && ./mvnw -DskipTests clean package
     startCommand: java -jar target/music-chart-api-0.1.jar
+    envVars:
+      - key: JAVA_VERSION
+        value: "11"
     autoDeploy: true

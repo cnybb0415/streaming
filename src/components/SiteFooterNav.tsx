@@ -31,7 +31,11 @@ function IconMusic({ className }: IconProps) {
   return (
     <svg
       viewBox="0 0 24 24"
-      className={className}
+      className={
+        className
+          ? `${className} block translate-y-[1px] -translate-x-[1.5px]`
+          : "block translate-y-[1px] -translate-x-[1.5px]"
+      }
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"
@@ -107,8 +111,8 @@ const items = [
   { label: "가이드", href: "/guide", Icon: IconBook },
   { label: "스트리밍", href: "/streaming", Icon: IconMusic },
   { label: "홈", href: "/", Icon: IconHome },
-  { label: "서포트", href: "/support", Icon: IconHeart },
   { label: "응원법", href: "/cheer", Icon: IconBalloon },
+  { label: "서포트", href: "/support", Icon: IconHeart },
 ] as const;
 
 function isActive(pathname: string, href: string) {

@@ -1,0 +1,128 @@
+import { readdir } from "node:fs/promises";
+import path from "node:path";
+
+const IMAGE_EXTENSIONS = new Set([".png", ".jpg", ".jpeg", ".webp", ".gif"]);
+
+function isAllowedImageFile(name: string): boolean {
+  const ext = path.extname(name).toLowerCase();
+  return IMAGE_EXTENSIONS.has(ext);
+}
+
+function encodePathSegments(...segments: string[]): string {
+  return segments.map((s) => encodeURIComponent(s)).join("/");
+}
+
+function parseLeadingNumber(name: string): number | null {
+  // Examples:
+  // - "01.늑대와 미녀 (Wolf)" -> 1
+  // - "16.Cream Soda" -> 16
+  const match = name.match(/^\s*(\d{1,3})\s*[.\-_\s]/);
+  if (!match) return null;
+  const n = Number(match[1]);
+  return Number.isFinite(n) ? n : null;
+}
+
+function stripLeadingNumber(name: string): string {
+  return name.replace(/^\s*\d{1,3}\s*[.\-_\s]+/, "").trim();
+}
+
+export type CheeringSongAsset = {
+  type: "image";
+  src: string;
+  alt: string;
+};
+
+export type CheeringSong = {
+  id: string; // folder name under public/images/cheering
+  label: string;
+  order: number | null;
+  coverSrc: string | null;
+  hasGuide: boolean;
+  guideAssets: CheeringSongAsset[];
+};
+
+async function listFilesIfExists(dirPath: string): Promise<string[]> {
+  try {
+    const entries = await readdir(dirPath, { withFileTypes: true });
+    return entries.filter((e) => e.isFile()).map((e) => e.name);
+  } catch {
+    return [];
+  }
+}
+
+export async function getCheeringSongs(): Promise<CheeringSong[]> {
+  const rootDir = path.join(process.cwd(), "public", "images", "cheering");
+  const entries = await readdir(rootDir, { withFileTypes: true });
+
+  const dirs = entries
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .filter((name) => !name.startsWith("."));
+
+  const songs = await Promise.all(
+    dirs.map(async (dirName) => {
+      const order = parseLeadingNumber(dirName);
+      const label = stripLeadingNumber(dirName) || dirName;
+
+      const albumArtDir = path.join(rootDir, dirName, "album-art");
+      const guideDir = path.join(rootDir, dirName, "guide");
+
+      const albumFiles = (await listFilesIfExists(albumArtDir))
+        .filter((n) => !n.startsWith("."))
+        .filter(isAllowedImageFile)
+        .sort((a, b) => a.localeCompare(b, "ko"));
+
+      const guideFiles = (await listFilesIfExists(guideDir))
+        .filter((n) => !n.startsWith("."))
+        .filter(isAllowedImageFile)
+        .sort((a, b) => a.localeCompare(b, "ko"));
+
+      const coverSrc = albumFiles.length
+        ? `/images/cheering/${encodePathSegments(dirName, "album-art", albumFiles[0])}`
+        : null;
+
+      const guideAssets: CheeringSongAsset[] = guideFiles.map((file) => ({
+        type: "image",
+        src: `/images/cheering/${encodePathSegments(dirName, "guide", file)}`,
+        alt: `${label} 응원법`,
+      }));
+
+      return {
+        id: dirName,
+        label,
+        order,
+        coverSrc,
+        hasGuide: guideAssets.length > 0,
+        guideAssets,
+      } satisfies CheeringSong;
+    })
+  );
+
+  // Sort by leading number DESC (reverse order), then by label.
+  songs.sort((a, b) => {
+    const ao = a.order;
+    const bo = b.order;
+
+    if (ao != null && bo != null) return bo - ao;
+    if (ao != null) return -1;
+    if (bo != null) return 1;
+
+    return a.label.localeCompare(b.label, "ko");
+  });
+
+  return songs;
+}
+
+export async function getCheeringSongById(id: string): Promise<CheeringSong | null> {
+  const songs = await getCheeringSongs();
+
+  // The URL segment may be encoded; we try best-effort decode.
+  let decoded = id;
+  try {
+    decoded = decodeURIComponent(id);
+  } catch {
+    // ignore
+  }
+
+  return songs.find((s) => s.id === decoded) ?? null;
+}

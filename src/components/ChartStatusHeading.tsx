@@ -41,9 +41,10 @@ export function ChartStatusHeading({
   className,
   showTime = true,
 }: ChartStatusHeadingProps) {
-  const [now, setNow] = useState(() => new Date());
+  const [now, setNow] = useState<Date | null>(null);
 
   useEffect(() => {
+    setNow(new Date());
     const id = window.setInterval(() => setNow(new Date()), 60_000);
     return () => window.clearInterval(id);
   }, []);
@@ -55,7 +56,7 @@ export function ChartStatusHeading({
       <span className="text-[1.125rem]">{safeTitle}</span>
       <span className="ml-1">의 실시간 차트 현황</span>
       <span className="ml-2 text-[0.7rem] text-foreground/60">
-        {formatKst(now, showTime)}
+        {now ? formatKst(now, showTime) : ""}
       </span>
     </h2>
   );

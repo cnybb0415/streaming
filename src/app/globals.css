@@ -50,6 +50,10 @@ html[data-scroll-locked="true"] .scroll-lock-pad {
   padding-right: var(--scrollbar-width, 0px);
 }
 
+html[data-scroll-locked="true"] nav[aria-label="하단 메뉴"] {
+  pointer-events: none;
+}
+
 /* Nanum Barun Gothic family names are split by weight in the provided CSS */
 h1,
 h2,

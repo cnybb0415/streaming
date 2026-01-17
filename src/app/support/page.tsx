@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -154,13 +154,10 @@ export default function SupportPage() {
 
   return (
     <div className="min-h-screen bg-transparent text-foreground">
-      <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+      <main className="mx-auto w-full max-w-6xl px-3 py-10 sm:px-6 sm:py-14">
         <h1 className="text-xl font-semibold">서포트</h1>
 
         <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>서포트</CardTitle>
-          </CardHeader>
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2">
               {tiles.map((tile) => (

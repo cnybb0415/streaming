@@ -4,6 +4,6 @@ services:
     env: java
     rootDir: korea-music-chart-api
     plan: free
-    buildCommand: ./mvnw -DskipTests package
+    buildCommand: ./mvnw -DskipTests clean package
     startCommand: java -jar target/music-chart-api-0.1.jar
     autoDeploy: true

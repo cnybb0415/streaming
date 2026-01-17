@@ -8,22 +8,20 @@ This project has two parts:
 
 1. Go to Render → **New** → **Blueprint**
 2. Choose this GitHub repo and let Render read `render.yaml`
-3. Create the service
+3. Create the service (it deploys the backend using **Docker**)
 4. After deploy finishes, copy the public URL:
    - Example: `https://korea-music-chart-api.onrender.com`
 
-If you created a service manually (not Blueprint), make sure these settings match:
+If you created a service manually (not Blueprint), use Docker instead of a native runtime:
 
-- **Environment**: Java
-- **Root Directory**: `korea-music-chart-api`
-- **Build Command**: `chmod +x mvnw && ./mvnw -DskipTests clean package`
-- **Start Command**: `java -jar target/music-chart-api-0.1.jar`
-- **Environment Variables**: `JAVA_VERSION=11`
+- **Runtime**: Docker
+- **Dockerfile path**: `korea-music-chart-api/Dockerfile`
+- **Docker build context**: `korea-music-chart-api`
 
 Troubleshooting:
 
-- If logs show **Node.js** being used and `JAVA_HOME` errors, the service is running in the wrong runtime.
-  Switch the service Environment to **Java** (or recreate it via **Blueprint** so `render.yaml` is applied).
+- If logs show **Node.js** being used and `JAVA_HOME` errors, you created the service with the wrong runtime.
+  Create a new service using **Blueprint** (recommended) or select **Docker** when creating the service.
 
 Quick checks:
 - Open `https://<RENDER_URL>/` (should respond)

@@ -12,6 +12,19 @@ This project has two parts:
 4. After deploy finishes, copy the public URL:
    - Example: `https://korea-music-chart-api.onrender.com`
 
+If you created a service manually (not Blueprint), make sure these settings match:
+
+- **Environment**: Java
+- **Root Directory**: `korea-music-chart-api`
+- **Build Command**: `chmod +x mvnw && ./mvnw -DskipTests clean package`
+- **Start Command**: `java -jar target/music-chart-api-0.1.jar`
+- **Environment Variables**: `JAVA_VERSION=11`
+
+Troubleshooting:
+
+- If logs show **Node.js** being used and `JAVA_HOME` errors, the service is running in the wrong runtime.
+  Switch the service Environment to **Java** (or recreate it via **Blueprint** so `render.yaml` is applied).
+
 Quick checks:
 - Open `https://<RENDER_URL>/` (should respond)
 - Or hit a known endpoint like `https://<RENDER_URL>/melon/chart/EXO`

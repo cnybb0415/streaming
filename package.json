@@ -6,8 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "postinstall": "npm install"
+  "lint": "eslint",
+  "postinstall": "npm install"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.1",

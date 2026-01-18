@@ -1,7 +1,7 @@
 export const siteConfig = {
   title: "EXO FANBASE",
   artistName: "EXO",
-  trackTitle: "첫 눈",
+  trackTitle: "Crown",
   releaseDate: "",
 
   links: {

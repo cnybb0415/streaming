@@ -190,6 +190,21 @@ export default function SupportPage() {
                     loading="lazy"
                   />
                 </div>
+
+                {/* 팀원 지원일 때만 지원하기 버튼 노출 */}
+                {activeTile.id === "team" && (
+                  <div className="mt-4 flex justify-end">
+                    <a
+                      href="https://x.com/EXO_REBIRTH"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <Button variant="default" size="lg">
+                        지원하기
+                      </Button>
+                    </a>
+                  </div>
+                )}
               </div>
             ) : null}
           </CardContent>

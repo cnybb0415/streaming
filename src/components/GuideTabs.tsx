@@ -6,6 +6,8 @@ import {
   streamingGuideServices,
   type GuideAsset,
   type StreamingGuideService,
+  voteGuides,
+  type VoteGuide,
 } from "@/data/guides";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -261,10 +263,163 @@ function StreamingTabs() {
   );
 }
 
-export function GuideTabs() {
+function VoteTabs() {
+  const guides = voteGuides;
+  const defaultGuide = guides[0]?.id ?? "";
+  if (!guides.length) {
+    return (
+      <EmptyState
+        title="사전투표 가이드"
+        lines={["src/data/guides.ts 에 voteGuides를 추가해 주세요."]}
+      />
+    );
+  }
   return (
-    <div className="space-y-6">
-      <StreamingTabs />
-    </div>
+    <Tabs defaultValue={defaultGuide}>
+      <div className="border-b border-foreground/10 pb-2">
+        <TabsList
+          aria-label="사전투표 방송"
+          className="w-full flex-nowrap justify-start gap-6 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none"
+        >
+          {guides.map((guide) => (
+            <TabsTrigger key={guide.id} value={guide.id} variant="underline">
+              <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                <span>{guide.label}</span>
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+      {guides.map((guide) => (
+        <TabsContent key={guide.id} value={guide.id}>
+          <Assets
+            title={`사전투표 가이드 · ${guide.label}`}
+            idKey={`vote-${guide.id}`}
+            assets={guide.assets}
+            emptyLines={[
+              `1) 파일을 public/images/vote/${guide.label}/guide/ 아래에 넣기`,
+              `2) src/data/guides.ts 에서 voteGuides > ${guide.label} assets에 경로 추가`,
+              `파일명 예시: /images/vote/${guide.label}/guide/guide.png`,
+            ]}
+          />
+        </TabsContent>
+      ))}
+    </Tabs>
+  );
+}
+
+
+
+function VoteTabsWithSidebar() {
+  // 프로그램별 로고 경로 매핑
+  const logoMap: Record<string, string> = {
+    musicbank: "/images/vote/뮤직뱅크/logo/뮤직뱅크_logo.png",
+    showchampion: "/images/vote/쇼챔피언/logo/쇼챔피언_logo.png",
+    mcountdown: "/images/vote/엠카운트다운/logo/엠카운트다운_logo.png",
+    musiccore: "/images/vote/음악중심/logo/음악중심_logo.png",
+    inkigayo: "/images/vote/인기가요/logo/인기가요_logo.png",
+  };
+  const guides = voteGuides;
+  const defaultGuide = guides[0]?.id ?? "";
+  if (!guides.length) {
+    return (
+      <EmptyState
+        title="사전투표 가이드"
+        lines={["src/data/guides.ts 에 voteGuides를 추가해 주세요."]}
+      />
+    );
+  }
+  return (
+    <Tabs defaultValue={defaultGuide}>
+      <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start">
+        <div className="md:w-[220px] md:shrink-0 md:self-stretch">
+          <Card>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-sm font-semibold text-foreground/80">항목</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <TabsList
+                aria-label="사전투표 프로그램"
+                className="flex flex-nowrap items-center gap-1 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none md:flex-col md:items-stretch md:overflow-visible"
+              >
+                {guides.map((guide) => (
+                  <TabsTrigger
+                    key={guide.id}
+                    value={guide.id}
+                    variant="sidebar"
+                    className="w-auto whitespace-nowrap md:w-full"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <img src={logoMap[guide.id]} alt={guide.label + ' 로고'} className="h-5 w-5" />
+                      <span>{guide.label}</span>
+                    </span>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="min-w-0 md:flex-1">
+          {guides.map((guide) => (
+            <TabsContent key={guide.id} value={guide.id} className="mt-0">
+              <Assets
+                title={`사전투표 가이드 · ${guide.label}`}
+                idKey={`vote-${guide.id}`}
+                assets={guide.assets}
+                emptyLines={[
+                  `1) 파일을 public/images/vote/${guide.label}/guide/ 아래에 넣기`,
+                  `2) src/data/guides.ts 에서 voteGuides > ${guide.label} assets에 경로 추가`,
+                  `파일명 예시: /images/vote/${guide.label}/guide/guide.png`,
+                ]}
+              />
+            </TabsContent>
+          ))}
+        </div>
+      </div>
+    </Tabs>
+  );
+}
+
+export function GuideTabs() {
+  // 상단 탭: 스트리밍 서비스 + 사전투표
+  const streamingTabs = streamingGuideServices.map((service) => ({
+    id: service.id,
+    label: service.label,
+    type: "streaming" as const,
+    service,
+  }));
+  const voteTab = { id: "vote", label: "사전투표", type: "vote" as const };
+  const allTabs = [...streamingTabs, voteTab];
+  const defaultTab = allTabs[0]?.id ?? "";
+
+  return (
+    <Tabs defaultValue={defaultTab}>
+      <div className="border-b border-foreground/10 pb-2">
+        <TabsList
+          aria-label="가이드 탭"
+          className="w-full flex-nowrap justify-start gap-6 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none"
+        >
+          {allTabs.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id} variant="underline">
+              <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                {tab.type === "streaming" && resolveMusicServiceIdFromLabel(tab.label) ? (
+                  <MusicServiceIcon label={tab.label} size={16} className="h-4 w-4" />
+                ) : null}
+                <span>{tab.label}</span>
+              </span>
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
+      {allTabs.map((tab) => (
+        <TabsContent key={tab.id} value={tab.id}>
+          {tab.type === "streaming" ? (
+            <StreamingServiceTabs service={tab.service} />
+          ) : (
+            <VoteTabsWithSidebar />
+          )}
+        </TabsContent>
+      ))}
+    </Tabs>
   );
 }

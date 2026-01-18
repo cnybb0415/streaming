@@ -1,3 +1,48 @@
+// 사전투표 가이드 타입
+export type VoteGuide = {
+  id: string;
+  label: string;
+  assets: GuideAsset[];
+};
+
+export const voteGuides: VoteGuide[] = [
+  {
+    id: "musicbank",
+    label: "뮤직뱅크",
+    assets: [
+      { type: "image", src: "/images/vote/뮤직뱅크/guide/팬캐스트.png", alt: "뮤직뱅크 팬캐스트 사전투표 가이드" },
+    ],
+  },
+  {
+    id: "showchampion",
+    label: "쇼챔피언",
+    assets: [
+      { type: "image", src: "/images/vote/쇼챔피언/guide/아이돌챔프.png", alt: "쇼챔피언 아이돌챔프 사전투표 가이드" },
+    ],
+  },
+  {
+    id: "mcountdown",
+    label: "엠카운트다운",
+    assets: [
+      { type: "image", src: "/images/vote/엠카운트다운/guide/엠넷플러스.png", alt: "엠카운트다운 엠넷플러스 사전투표 가이드" },
+    ],
+  },
+  {
+    id: "musiccore",
+    label: "음악중심",
+    assets: [
+      { type: "image", src: "/images/vote/음악중심/guide/뮤빗.png", alt: "음악중심 뮤빗 사전투표 가이드" },
+    ],
+  },
+  {
+    id: "inkigayo",
+    label: "인기가요",
+    assets: [
+      { type: "image", src: "/images/vote/인기가요/guide/링크.png", alt: "인기가요 링크 사전투표 가이드" },
+      { type: "image", src: "/images/vote/인기가요/guide/하이어.png", alt: "인기가요 하이어 사전투표 가이드" },
+    ],
+  },
+];
 export type GuideAsset =
   | { type: "image"; src: string; alt?: string; fallbackSrcs?: string[] }
   | { type: "pdf"; href: string; label?: string };
@@ -80,11 +125,25 @@ function buildStreamingParts(serviceId: string, serviceLabel: string): Streaming
  *   예) /images/cheering/who-are-you/guide/who-are-you.jpg
  */
 export const streamingGuideServices: StreamingGuideService[] = [
-  { id: "melon", label: "멜론", parts: buildStreamingParts("melon", "멜론") },
-  { id: "genie", label: "지니", parts: buildStreamingParts("genie", "지니") },
-  { id: "bugs", label: "벅스", parts: buildStreamingParts("bugs", "벅스") },
-  { id: "flo", label: "플로", parts: buildStreamingParts("flo", "플로") },
-  { id: "vibe", label: "바이브", parts: buildStreamingParts("vibe", "바이브") },
+  // 멜론, 지니, 벅스: 다운로드/기프트/ID생성 등 전체 가이드
+  {
+    id: "melon",
+    label: "멜론",
+    parts: buildStreamingParts("melon", "멜론").filter((part) => part.id !== "gift"),
+  },
+  {
+    id: "genie",
+    label: "지니",
+    parts: buildStreamingParts("genie", "지니").filter((part) => part.id !== "gift"),
+  },
+  {
+    id: "bugs",
+    label: "벅스",
+    parts: buildStreamingParts("bugs", "벅스").filter((part) => part.id !== "gift"),
+  },
+  // 플로, 바이브: 스트리밍만 남김
+  { id: "flo", label: "플로", parts: [buildStreamingParts("flo", "플로")[0]] },
+  { id: "vibe", label: "바이브", parts: [buildStreamingParts("vibe", "바이브")[0]] },
 ];
 
 export const cheeringGuideSongs: CheeringGuideSong[] = [

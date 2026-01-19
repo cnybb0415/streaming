@@ -56,7 +56,7 @@ export type GuideAsset =
   | { type: "pdf"; href: string; label?: string };
 
 export type StreamingGuidePart = {
-  id: "streaming" | "signup" | "download" | "gift";
+  id: "streaming" | "signup" | "download" | "gift" | "pcver" | "mobilever";
   label: string;
   assets: GuideAsset[];
 };
@@ -91,6 +91,8 @@ const partFolderById: Record<StreamingGuidePart["id"], string> = {
   signup: "idcreate",
   download: "download",
   gift: "gift",
+  pcver: "PCver",
+  mobilever: "모바일ver",
 };
 
 function buildStreamingParts(serviceId: string, serviceLabel: string): StreamingGuidePart[] {

@@ -124,9 +124,12 @@ export const siteConfig = {
     {
       id: "bugs",
       label: "벅스",
-      iosHref: "https://exoxoxob.qaa.kr",
-      androidHref: "https://exoxoxob.qaa.kr",
-      webHref: "https://exoxoxob.qaa.kr",
+      iosHref:
+        "bugs3://app/tracks/lists?title=%EC%A0%84%EC%B2%B4%EB%93%A3%EA%B8%B0&miniplay=Y&track_ids=6407607|6407608|6391981|6407609|6407610|6407607|6407608|6391981|6407611|6407612|6407607|6407608|6391981|6407613|6407614|6407607|6407611|6407613|6407614",
+      androidHref:
+        "bugs3://app/tracks/lists?title=%EC%A0%84%EC%B2%B4%EB%93%A3%EA%B8%B0&miniplay=Y&track_ids=6407607|6407608|6391981|6407609|6407610|6407607|6407608|6391981|6407611|6407612|6407607|6407608|6391981|6407613|6407614|6407607|6407611|6407613|6407614",
+      webHref:
+        "bugs3://app/tracks/lists?title=%EC%A0%84%EC%B2%B4%EB%93%A3%EA%B8%B0&miniplay=Y&track_ids=6407607|6407608|6391981|6407609|6407610|6407607|6407608|6391981|6407611|6407612|6407607|6407608|6391981|6407613|6407614|6407607|6407611|6407613|6407614",
     },
     {
       id: "flo",

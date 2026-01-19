@@ -30,12 +30,9 @@ function expandExtensionCandidates(url: string) {
   const m = url.match(/^(.*)\.(png|jpg|jpeg|webp)$/i);
   if (!m) return [url];
   const base = m[1];
-  return [
-    `${base}.png`,
-    `${base}.jpg`,
-    `${base}.jpeg`,
-    `${base}.webp`,
-  ];
+  const original = m[2].toLowerCase();
+  const order = ["png", "jpg", "jpeg", "webp"].filter((ext) => ext !== original);
+  return [`${base}.${original}`, ...order.map((ext) => `${base}.${ext}`)];
 }
 
 function GuideImage({

@@ -121,7 +121,13 @@ export const siteConfig = {
         "cromegenie://scan/?landing_type=31&landing_target=113074172;113074173;113074180;113074174;113074175;113074172;113074173;113074180;113074176;113074177;113074172;113074173;113074180;113074178;113074179;113074172;113074176;113074178;113074179",
     },
 
-    { id: "bugs", label: "벅스", iosHref: "", androidHref: "", webHref: "" },
+    {
+      id: "bugs",
+      label: "벅스",
+      iosHref: "https://exoxoxob.qaa.kr",
+      androidHref: "https://exoxoxob.qaa.kr",
+      webHref: "https://exoxoxob.qaa.kr",
+    },
     {
       id: "flo",
       label: "플로",

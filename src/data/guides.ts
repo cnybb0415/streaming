@@ -91,8 +91,8 @@ const partFolderById: Record<StreamingGuidePart["id"], string> = {
   signup: "idcreate",
   download: "download",
   gift: "gift",
-  pcver: "PCver",
-  mobilever: "모바일ver",
+  pcver: "PC",
+  mobilever: "모바일",
 };
 
 function buildStreamingParts(serviceId: string, serviceLabel: string): StreamingGuidePart[] {
@@ -142,18 +142,18 @@ export const streamingGuideServices: StreamingGuideService[] = [
     parts: [
       {
         id: "pcver",
-        label: "PCver",
+        label: "PC",
         assets: [
-          { type: "image", src: "/images/guides/뮤직비디오/PCver/PC.png", alt: "뮤직비디오 PCver 1" },
-          { type: "image", src: "/images/guides/뮤직비디오/PCver/PC2.png", alt: "뮤직비디오 PCver 2" },
+          { type: "image", src: "/images/guides/뮤직비디오/PC/PC.png", alt: "뮤직비디오 PCver 1" },
+          { type: "image", src: "/images/guides/뮤직비디오/PC/PC2.png", alt: "뮤직비디오 PCver 2" },
         ],
       },
       {
         id: "mobilever",
-        label: "모바일ver",
+        label: "모바일",
         assets: [
-          { type: "image", src: "/images/guides/뮤직비디오/모바일ver/모바일.png", alt: "뮤직비디오 모바일ver 1" },
-          { type: "image", src: "/images/guides/뮤직비디오/모바일ver/모바일2.png", alt: "뮤직비디오 모바일ver 2" },
+          { type: "image", src: "/images/guides/뮤직비디오/모바일/모바일.png", alt: "뮤직비디오 모바일ver 1" },
+          { type: "image", src: "/images/guides/뮤직비디오/모바일/모바일2.png", alt: "뮤직비디오 모바일ver 2" },
         ],
       },
     ],

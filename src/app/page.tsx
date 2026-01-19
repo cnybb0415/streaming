@@ -7,6 +7,8 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import logoPng from "@/../public/images/logo.png";
 
+export const dynamic = "force-dynamic";
+
 function SocialIcon({ children }: { children: ReactNode }) {
   return (
     <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-foreground/15 bg-white shadow-sm">

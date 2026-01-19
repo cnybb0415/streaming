@@ -195,7 +195,11 @@ async function fetchChartsAndPersist(
         },
       ],
     };
-    await writeChartsCache(data);
+    try {
+      await writeChartsCache(data);
+    } catch {
+      // Ignore cache write failures in read-only environments (e.g. serverless).
+    }
     return data;
   }
 
@@ -298,7 +302,11 @@ async function fetchChartsAndPersist(
     items,
   };
 
-  await writeChartsCache(data);
+  try {
+    await writeChartsCache(data);
+  } catch {
+    // Ignore cache write failures in read-only environments (e.g. serverless).
+  }
   return data;
 }
 

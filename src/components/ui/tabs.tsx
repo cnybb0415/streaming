@@ -66,7 +66,7 @@ export function TabsList({
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        "flex flex-wrap items-center gap-2 rounded-2xl border border-foreground/10 bg-white p-2 shadow-sm [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        "flex flex-nowrap items-center gap-2 rounded-2xl border border-foreground/10 bg-white p-2 shadow-sm overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
         className
       )}
     >
@@ -124,7 +124,7 @@ export function TabsTrigger({
       onClick={() => setValue(value)}
       onKeyDown={onKeyDown}
       className={cn(
-        "inline-flex items-center justify-center text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20",
+        "inline-flex shrink-0 items-center justify-center text-sm whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20",
         variant === "pill" &&
           "h-10 rounded-xl px-4 font-semibold",
         variant === "pill" &&

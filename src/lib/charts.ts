@@ -60,7 +60,7 @@ export async function getChartsData(): Promise<ChartsData> {
   const url = overrideUrl ? toAbsoluteUrl(overrideUrl) : toAbsoluteUrl("/api/charts");
 
   try {
-    const response = await fetch(url, { next: { revalidate: 60 } });
+    const response = await fetch(url, { cache: "no-store" });
     if (!response.ok) return localCharts as ChartsData;
 
     const json = (await response.json()) as unknown;

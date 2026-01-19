@@ -21,6 +21,44 @@ type ChartsCacheFile = {
   items: Array<{ label: string; status?: string; rank?: number; prevRank?: number }>;
 };
 
+type PlatformDef = {
+  label: string;
+  buildEndpoint: (base: string, artistName: string) => string;
+};
+
+const PLATFORM_DEFS: PlatformDef[] = [
+  {
+    label: "멜론 TOP100",
+    buildEndpoint: (base, artist) => `${base}/melon/chart/${encodeURIComponent(artist)}`,
+  },
+  {
+    label: "멜론 HOT100 100일",
+    buildEndpoint: (base, artist) =>
+      `${base}/melon/hot100/D100/chart/${encodeURIComponent(artist)}`,
+  },
+  {
+    label: "멜론 HOT100 30일",
+    buildEndpoint: (base, artist) =>
+      `${base}/melon/hot100/D30/chart/${encodeURIComponent(artist)}`,
+  },
+  {
+    label: "지니 TOP200",
+    buildEndpoint: (base, artist) => `${base}/genie/chart/${encodeURIComponent(artist)}`,
+  },
+  {
+    label: "벅스 실시간",
+    buildEndpoint: (base, artist) => `${base}/bugs/chart/${encodeURIComponent(artist)}`,
+  },
+  {
+    label: "플로 24시간",
+    buildEndpoint: (base, artist) => `${base}/flo/chart/${encodeURIComponent(artist)}`,
+  },
+  {
+    label: "바이브 국내 급상승",
+    buildEndpoint: (base, artist) => `${base}/vibe/chart/${encodeURIComponent(artist)}`,
+  },
+];
+
 function extractEntries(json: unknown): ProviderEntry[] {
   if (Array.isArray(json)) return json as ProviderEntry[];
   if (!json || typeof json !== "object") return [];
@@ -209,49 +247,11 @@ async function fetchChartsAndPersist(
     if (typeof item.rank === "number") prevRankByLabel.set(item.label, item.rank);
   });
 
-  const platforms = [
-    {
-      label: "멜론 TOP100",
-      buildEndpoint: (base: string) =>
-        `${base}/melon/chart/${encodeURIComponent(artistName)}`,
-    },
-    {
-      label: "멜론 HOT100 100일",
-      buildEndpoint: (base: string) =>
-        `${base}/melon/hot100/D100/chart/${encodeURIComponent(artistName)}`,
-    },
-    {
-      label: "멜론 HOT100 30일",
-      buildEndpoint: (base: string) =>
-        `${base}/melon/hot100/D30/chart/${encodeURIComponent(artistName)}`,
-    },
-    {
-      label: "지니 TOP200",
-      buildEndpoint: (base: string) =>
-        `${base}/genie/chart/${encodeURIComponent(artistName)}`,
-    },
-    {
-      label: "벅스 실시간",
-      buildEndpoint: (base: string) =>
-        `${base}/bugs/chart/${encodeURIComponent(artistName)}`,
-    },
-    {
-      label: "플로 24시간",
-      buildEndpoint: (base: string) =>
-        `${base}/flo/chart/${encodeURIComponent(artistName)}`,
-    },
-    {
-      label: "바이브 국내 급상승",
-      buildEndpoint: (base: string) =>
-        `${base}/vibe/chart/${encodeURIComponent(artistName)}`,
-    },
-  ] as const;
-
-  const results: Array<ChartItem | null> = new Array(platforms.length).fill(null);
+  const results: Array<ChartItem | null> = new Array(PLATFORM_DEFS.length).fill(null);
 
   await Promise.all(
-    platforms.map(async (platform, index) => {
-      const endpoint = platform.buildEndpoint(baseUrl.replace(/\/+$/, ""));
+    PLATFORM_DEFS.map(async (platform, index) => {
+      const endpoint = platform.buildEndpoint(baseUrl.replace(/\/+$/, ""), artistName);
 
       let response: Response;
       try {
@@ -386,12 +386,10 @@ export async function GET(request: Request): Promise<Response> {
     // Keep the API shape stable even if something unexpected happens.
     const data: ChartsData = {
       lastUpdated: getKstTopOfHourIso(new Date()),
-      items: [
-        {
-          label: "차트",
-          status: "차트 연동 실패",
-        },
-      ],
+      items: PLATFORM_DEFS.map((platform) => ({
+        label: platform.label,
+        status: "차트 연동 실패",
+      })),
     };
     try {
       await writeChartsCache(data);

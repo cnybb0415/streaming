@@ -1,4 +1,56 @@
+
 "use client";
+import { Zap, ShoppingBag, Radio, MessageSquare, Megaphone } from "lucide-react";
+
+function IconBookClosed({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M4 19.5c0-1.9 1.6-3.5 3.5-3.5H20" />
+      <path d="M4 4.5C4 3.1 5.1 2 6.5 2H20v20H7.5C5.6 22 4 20.4 4 18.5v-14z" />
+      <path d="M8 6h8" />
+      <path d="M8 9h8" />
+    </svg>
+  );
+}
+function IconMusic({ size = 18 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M9 18a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
+      <path d="M19 16a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z" />
+      <path d="M11.5 13V5l10-2v8" />
+      <path d="M11.5 7l10-2" />
+    </svg>
+  );
+}
+
+const actionIcons: Record<string, React.ReactNode> = {
+  "원클릭 스트리밍": <IconMusic />,
+  "REVERXE 앨범구매": <ShoppingBag size={18} />,
+  "라디오 신청하기": <Radio size={18} />,
+  "생방송 문자투표": <MessageSquare size={18} />,
+  "가이드": <IconBookClosed />,
+  "응원법": <Megaphone size={18} />,
+};
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
@@ -120,6 +172,7 @@ export function QuickActionsBar({
           className: cn("w-full", buttonClassName),
         } as const;
 
+
         if (isStreaming) {
           return (
             <Button
@@ -127,7 +180,10 @@ export function QuickActionsBar({
               {...shared}
               onClick={openStreamingModal}
             >
-              {action.label}
+              <span className="inline-flex items-center gap-2 justify-center align-middle h-[22px]">
+                <span className={action.label === "가이드" ? "flex items-center h-full relative top-[1px]" : "flex items-center h-full"}>{actionIcons[action.label]}</span>
+                <span className="flex items-center h-full">{action.label}</span>
+              </span>
             </Button>
           );
         }
@@ -139,7 +195,10 @@ export function QuickActionsBar({
               {...shared}
               onClick={openAlbumModal}
             >
-              {action.label}
+              <span className="inline-flex items-center gap-2">
+                {actionIcons[action.label]}
+                {action.label}
+              </span>
             </Button>
           );
         }
@@ -147,7 +206,10 @@ export function QuickActionsBar({
         if (isSmsVote) {
           return (
             <Button key={action.label} {...shared} onClick={() => openSmsVote(action)}>
-              {action.label}
+              <span className="inline-flex items-center gap-2">
+                {actionIcons[action.label]}
+                {action.label}
+              </span>
             </Button>
           );
         }
@@ -162,7 +224,12 @@ export function QuickActionsBar({
             rel={isExternal && action.href.startsWith("http") ? "noopener noreferrer" : undefined}
             className="w-full"
           >
-            <Button {...shared}>{action.label}</Button>
+            <Button {...shared}>
+              <span className="inline-flex items-center gap-2">
+                {actionIcons[action.label]}
+                {action.label}
+              </span>
+            </Button>
           </a>
         );
       })}

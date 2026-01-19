@@ -349,10 +349,14 @@ function VoteTabsWithSidebar() {
                     variant="sidebar"
                     className="w-auto whitespace-nowrap md:w-full"
                   >
-                    <span className="inline-flex items-center gap-2">
-                      <img src={logoMap[guide.id]} alt={guide.label + ' 로고'} className="h-5 w-5" />
+                    {guide.id !== "common" ? (
+                      <span className="inline-flex items-center gap-2">
+                        <img src={logoMap[guide.id]} alt={guide.label + ' 로고'} className="h-5 w-5" />
+                        <span>{guide.label}</span>
+                      </span>
+                    ) : (
                       <span>{guide.label}</span>
-                    </span>
+                    )}
                   </TabsTrigger>
                 ))}
               </TabsList>
@@ -381,15 +385,22 @@ function VoteTabsWithSidebar() {
 }
 
 export function GuideTabs() {
-  // 상단 탭: 스트리밍 서비스 + 사전투표
+  // Move 사전투표 to the front, 뮤직비디오 to the end
+  const voteTab = { id: "vote", label: "사전투표", type: "vote" as const };
   const streamingTabs = streamingGuideServices.map((service) => ({
     id: service.id,
     label: service.label,
     type: "streaming" as const,
     service,
   }));
-  const voteTab = { id: "vote", label: "사전투표", type: "vote" as const };
-  const allTabs = [...streamingTabs, voteTab];
+  // Find 뮤직비디오 and move to end
+  const mvIndex = streamingTabs.findIndex((t) => t.id === "mv");
+  let orderedStreamingTabs = streamingTabs;
+  if (mvIndex !== -1) {
+    const [mvTab] = orderedStreamingTabs.splice(mvIndex, 1);
+    orderedStreamingTabs = [...orderedStreamingTabs, mvTab];
+  }
+  const allTabs = [voteTab, ...orderedStreamingTabs];
   const defaultTab = allTabs[0]?.id ?? "";
 
   return (

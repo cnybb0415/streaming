@@ -75,6 +75,8 @@ export function OneClickStreamingGrid({
     <div className={`grid ${columnsClassName}`}>
       {links.map((link) => {
         const href = pickHref(link, platform);
+        // 준비중: 모든 플랫폼에 링크가 아예 없음
+        const isTrulyUnavailable = !link.iosHref && !link.androidHref && !link.webHref;
         const disabled = !href;
 
         return (
@@ -91,7 +93,9 @@ export function OneClickStreamingGrid({
                 <MusicServiceIcon label={link.label} size={18} className="h-[18px] w-[18px]" />
               </span>
               <span className="whitespace-nowrap">{link.label}</span>
-              {disabled ? <span className="ml-1 text-xs text-foreground/50">(준비중)</span> : null}
+              {isTrulyUnavailable ? (
+                <span className="ml-1 text-xs text-foreground/50">(준비중)</span>
+              ) : null}
             </span>
           </Button>
         );

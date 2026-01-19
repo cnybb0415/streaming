@@ -5,19 +5,75 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.maxjang.chart.common.ChartVO;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
 public class FloChartService {
 
+    private static final Logger logger = LoggerFactory.getLogger(FloChartService.class);
+    private static final Duration REFRESH_INTERVAL = Duration.ofHours(1);
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final Object cacheLock = new Object();
+    private volatile List<ChartVO> cachedChart = Collections.emptyList();
+    private volatile Instant lastFetchedAt = Instant.EPOCH;
 
     public List<ChartVO> getFloChartTop100(String artistName) throws Exception {
-        // FLO "FLO 차트" (id=1): 최근 24시간 집계, 01시 기준, 총 100곡
-        String url = "https://www.music-flo.com/api/meta/v1/chart/track/1";
+        List<ChartVO> chart = getOrRefreshChart();
+        if (artistName == null || artistName.trim().isEmpty()) {
+            return new ArrayList<>(chart);
+        }
+
+        List<ChartVO> filtered = new ArrayList<>();
+        String needle = artistName.trim();
+        for (ChartVO item : chart) {
+            if (item != null && item.getArtistName() != null && item.getArtistName().contains(needle)) {
+                filtered.add(item);
+            }
+        }
+
+        return filtered;
+    }
+
+    @Scheduled(cron = "0 0 * * * *")
+    public void refreshFloChartHourly() {
+        try {
+            refreshChart();
+        } catch (Exception ex) {
+            logger.warn("Failed to refresh FLO chart cache", ex);
+        }
+    }
+
+    private List<ChartVO> getOrRefreshChart() throws Exception {
+        if (!cachedChart.isEmpty() && isFresh()) {
+            return cachedChart;
+        }
+
+        synchronized (cacheLock) {
+            if (!cachedChart.isEmpty() && isFresh()) {
+                return cachedChart;
+            }
+            refreshChart();
+            return cachedChart;
+        }
+    }
+
+    private boolean isFresh() {
+        return Duration.between(lastFetchedAt, Instant.now()).compareTo(REFRESH_INTERVAL) < 0;
+    }
+
+    private void refreshChart() throws Exception {
+        // FLO "FLO 차트" (id=1): 최근 24시간 집계, 총 100곡
+        String url = "https://www.music-flo.com/api/display/v1/browser/chart/1/track/list?size=100";
 
         Connection.Response res = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0")
@@ -28,31 +84,34 @@ public class FloChartService {
 
         FloRoot root = objectMapper.readValue(res.body(), FloRoot.class);
         List<FloTrack> tracks = root != null && root.data != null ? root.data.trackList : null;
-        if (tracks == null) return new ArrayList<>();
-
         List<ChartVO> data = new ArrayList<>();
-        int chartRank = 1;
+        if (tracks == null) {
+            cachedChart = data;
+            lastFetchedAt = Instant.now();
+            return;
+        }
 
+        int chartRank = 1;
         for (FloTrack track : tracks) {
             String resolvedArtistName = resolveArtistName(track);
-            if (artistName == null || (resolvedArtistName != null && resolvedArtistName.contains(artistName))) {
-                String[] rankStatus = resolveRankStatus(track);
+            String[] rankStatus = resolveRankStatus(track);
 
-                data.add(ChartVO.builder()
-                        .rank(chartRank)
-                        .artistName(resolvedArtistName)
-                        .title(track != null ? track.name : null)
-                        .albumName(track != null && track.album != null ? track.album.title : null)
-                        .albumArt(resolveAlbumArt(track))
-                        .songNumber(track != null && track.id != null ? String.valueOf(track.id) : null)
-                        .rankStatus(rankStatus[0])
-                        .changedRank(Integer.parseInt(rankStatus[1]))
-                        .build());
-            }
+            data.add(ChartVO.builder()
+                    .rank(chartRank)
+                    .artistName(resolvedArtistName)
+                    .title(track != null ? track.name : null)
+                    .albumName(track != null && track.album != null ? track.album.title : null)
+                    .albumArt(resolveAlbumArt(track))
+                    .songNumber(track != null && track.id != null ? String.valueOf(track.id) : null)
+                    .rankStatus(rankStatus[0])
+                    .changedRank(Integer.parseInt(rankStatus[1]))
+                    .build());
+
             chartRank++;
         }
 
-        return data;
+        cachedChart = data;
+        lastFetchedAt = Instant.now();
     }
 
     private String resolveArtistName(FloTrack track) {

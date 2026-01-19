@@ -163,27 +163,21 @@ function pickTrackEntry(
   const artistKey = normalizeComparable(artistName);
   const trackKey = normalizeComparable(trackTitle);
 
-  const byTrack = entries.filter((e) => {
-    if (!trackKey) return false;
+  if (!artistKey || !trackKey) return undefined;
+
+  const byTrackAndArtist = entries.filter((e) => {
     const titleKey = normalizeComparable(e.title);
-    if (!titleKey) return false;
-    return titleKey === trackKey || titleKey.includes(trackKey) || trackKey.includes(titleKey);
-  });
-
-  const byTrackAndArtist = byTrack.filter((e) => {
-    if (!artistKey) return false;
     const entryArtistKey = normalizeComparable(e.artistName);
-    return entryArtistKey.includes(artistKey);
+    if (!titleKey || !entryArtistKey) return false;
+
+    const titleMatch =
+      titleKey === trackKey || titleKey.includes(trackKey) || trackKey.includes(titleKey);
+    const artistMatch = entryArtistKey.includes(artistKey);
+
+    return titleMatch && artistMatch;
   });
 
-  const scoped = (byTrackAndArtist.length ? byTrackAndArtist : byTrack).length
-    ? (byTrackAndArtist.length ? byTrackAndArtist : byTrack)
-    : entries.filter((e) => {
-        const artist = normalizeText(e.artistName);
-        return artistNorm.length > 0 && artist.includes(artistNorm);
-      });
-
-  return scoped[0];
+  return byTrackAndArtist[0];
 }
 
 async function fetchChartsAndPersist(

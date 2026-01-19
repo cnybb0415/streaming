@@ -21,13 +21,6 @@ const CARDS: CardDef[] = [
     matchLabels: ["멜론 TOP100"],
   },
   {
-    id: "melon_realtime",
-    provider: "melon",
-    providerLabel: "멜론",
-    typeLabel: "실시간",
-    matchLabels: ["멜론 실시간", "멜론 realtime", "멜론 REALTIME"],
-  },
-  {
     id: "melon_hot100_100d",
     provider: "melon",
     providerLabel: "멜론",
@@ -118,6 +111,20 @@ function getChange(rank?: number, prevRank?: number): { label: string; className
   return { label: `↓${rank - prevRank}`, className: "text-blue-500" };
 }
 
+function renderTypeLabel(typeLabel: string) {
+  const hotMatch = typeLabel.match(/^HOT100\s+(100일|30일)$/);
+  if (hotMatch) {
+    const day = hotMatch[1];
+    return (
+      <span>
+        HOT100 <span className="text-[10px] font-semibold text-neutral-400">({day})</span>
+      </span>
+    );
+  }
+
+  return <span>{typeLabel}</span>;
+}
+
 function ProviderIcon({ provider, label }: { provider: ProviderKey; label: string }) {
   return (
     <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-foreground/10">
@@ -197,7 +204,7 @@ export function ChartSummaryGrid({
                   <div className="min-w-0">
                     <p className="text-sm font-bold leading-none truncate">{card.providerLabel}</p>
                     <p className="mt-1 text-xs text-neutral-500 leading-none truncate">
-                      {card.typeLabel}
+                      {renderTypeLabel(card.typeLabel)}
                     </p>
                   </div>
                 </div>

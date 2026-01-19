@@ -1,5 +1,5 @@
 export const siteConfig = {
-  title: "EXO FANBASE",
+  title: "EXO STREAMING",
   artistName: "EXO",
   trackTitle: "Crown",
   releaseDate: "",
@@ -30,9 +30,9 @@ export const siteConfig = {
   },
 
   youtube: {
-    videoId: "lpHyoTXgCRk",
-    url: "https://youtu.be/lpHyoTXgCRk?si=caVrqz49QnGYVs_r",
-    embedUrl: "https://www.youtube.com/embed/lpHyoTXgCRk",
+    videoId: "BWfKkqo1Mk8",
+    url: "https://youtu.be/BWfKkqo1Mk8?si=OSCkEoUdApwZ5SNW",
+    embedUrl: "https://www.youtube.com/embed/BWfKkqo1Mk8",
   },
 
   actions: [
@@ -77,34 +77,94 @@ export const siteConfig = {
   // iosHref / androidHref / webHref 중 필요한 것만 채우면 됩니다.
   oneClickStreamingLinks: [
     // 멜론: 안드로이드 전용 링크 4개를 각각 별도 버튼으로 노출
-    { id: "melon", label: "멜론 1", androidHref: "https://1xoxo1248.qaa.kr" },
-    { id: "melon", label: "멜론 2", androidHref: "https://2xoxo1248.qaa.kr" },
-    { id: "melon", label: "멜론 3", androidHref: "https://3xoxo1248.qaa.kr" },
-    { id: "melon", label: "멜론 4", androidHref: "https://4xoxo1248.qaa.kr" },
+
+    {
+      id: "melon",
+      label: "멜론 Android 1",
+      androidHref:
+        "melonapp://play?menuid=0&ctype=1&cid=600691215,600691216,600691223,600691217,600691218",
+    },
+    {
+      id: "melon",
+      label: "멜론 Android 2",
+      androidHref:
+        "melonapp://play?menuid=0&ctype=1&cid=600691215,600691216,600691223,600691219,600691220",
+    },
+    {
+      id: "melon",
+      label: "멜론 Android 3",
+      androidHref:
+        "melonapp://play?menuid=0&ctype=1&cid=600691215,600691216,600691223,600691221,600691222",
+    },
+    {
+      id: "melon",
+      label: "멜론 Android 4",
+      androidHref:
+        "melonapp://play?menuid=0&ctype=1&cid=600691215,600691219,600691221,600691222",
+    },
 
     // 멜론: iOS 전용 링크
-    { id: "melon", label: "멜론 iOS", iosHref: "https://xoxo1248.enn.kr" },
+    {
+      id: "melon",
+      label: "멜론 iOS",
+      iosHref:
+        "meloniphone://play/?ctype=1&menuid=0&cid=600691215,600691216,600691223,600691217,600691218,600691215,600691216,600691223,600691219,600691220,600691215,600691216,600691223,600691221,600691222,600691215,600691219,600691221,600691222",
+    },
 
     // 지니: OS별 링크
-    { id: "genie", label: "지니", iosHref: "https://1xoxo1248.enn.kr", androidHref: "https://1xoxo1248.uzu.kr" },
+    {
+      id: "genie",
+      label: "지니",
+      iosHref:
+        "ktolleh00167://landing/?landing_type=31&landing_target=113074172;113074173;113074180;113074174;113074175;113074172;113074173;113074180;113074176;113074177;113074172;113074173;113074180;113074178;113074179;113074172;113074176;113074178;113074179",
+      androidHref:
+        "cromegenie://scan/?landing_type=31&landing_target=113074172;113074173;113074180;113074174;113074175;113074172;113074173;113074180;113074176;113074177;113074172;113074173;113074180;113074178;113074179;113074172;113074176;113074178;113074179",
+    },
 
     { id: "bugs", label: "벅스", iosHref: "", androidHref: "", webHref: "" },
-    { id: "flo", label: "플로", iosHref: "", androidHref: "", webHref: "" },
-    { id: "vibe", label: "바이브", iosHref: "", androidHref: "", webHref: "" },
+    {
+      id: "flo",
+      label: "플로",
+      iosHref:
+        "flomusic://play/track?ids=570963566,570963567,570963574,570963568,570963569,570963566,570963567,570963574,570963570,570963571,570963566,570963567,570963574,570963572,570963573,570963566,570963570,570963572,570963573",
+      androidHref:
+        "flomusic://play/track?ids=570963566,570963567,570963574,570963568,570963569,570963566,570963567,570963574,570963570,570963571,570963566,570963567,570963574,570963572,570963573,570963566,570963570,570963572,570963573",
+    },
+    {
+      id: "vibe",
+      label: "바이브 1",
+      iosHref: "vibe://listen?version=3&trackIds=98953180,98953181,98953188,98953182,98953183",
+      androidHref: "vibe://listen?version=3&trackIds=98953180,98953181,98953188,98953182,98953183",
+    },
+    {
+      id: "vibe",
+      label: "바이브 2",
+      iosHref: "vibe://listen?version=3&trackIds=98953180,98953181,98953188,98953184,98953185",
+      androidHref: "vibe://listen?version=3&trackIds=98953180,98953181,98953188,98953184,98953185",
+    },
+    {
+      id: "vibe",
+      label: "바이브 3",
+      iosHref: "vibe://listen?version=3&trackIds=98953180,98953181,98953188,98953186,98953187",
+      androidHref: "vibe://listen?version=3&trackIds=98953180,98953181,98953188,98953186,98953187",
+    },
+    {
+      id: "vibe",
+      label: "바이브 4",
+      iosHref: "vibe://listen?version=3&trackIds=98953180,98953184,98953186,98953187",
+      androidHref: "vibe://listen?version=3&trackIds=98953180,98953184,98953186,98953187",
+    },
   ] as const,
 
   albumPurchaseLinks: [
-    { label: "메이크스타", href: "https://www.makestar.com/product/14849" },
-    { label: "뮤브", href: "https://www.muvve.co.kr/surl/P/158" },
+    { label: "메이크스타", href: "https://www.makestar.com/product/14771" },
+    { label: "뮤브", href: "https://www.muvve.co.kr/product/detail.html?product_no=166&cate_no=43&display_group=1" },
     { label: "베리즈", href: "https://shop.berriz.in/ko/product/?productId=246447171123648" },
     { label: "알라딘", href: "https://www.aladin.co.kr/shop/wproduct.aspx?ItemId=380802354&start=pcsearch_auto" },
-    {
-      label: "애플뮤직",
-      href: "https://www.applemusic.co.kr/board/board.html?code=applemusic_board2&type=v&num1=997382&num2=00000&lock=",
-    },
+    { label: "애플뮤직", href: "https://www.applemusic.co.kr/shop/shopdetail.html?branduid=3398193&search=exo&sort=regdate&xcode=009&mcode=001&scode=001&GfDT=Zmp3UQ%3D%3D" },
     { label: "위드뮤", href: "https://withmuu.com/goods/goods_view.php?goodsNo=1000013450" },
-    { label: "YES24", href: "https://event.yes24.com/detail?eventNo=265748" },
-    { label: "케이타운포유", href: "https://kr.ktown4u.com/eventsub?eve_no=43931709&biz_no=967" },
+    { label: "YES24", href: "https://www.yes24.com/product/goods/169141936" },
+    { label: "케이타운포유", href: "https://kr.ktown4u.com/iteminfo?goods_no=153803" },
     { label: "핫트랙스", href: "https://hottracks.kyobobook.co.kr/media/music/detail/S000218796429" },
   ] as const,
 

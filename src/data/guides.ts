@@ -7,10 +7,11 @@ export type VoteGuide = {
 
 export const voteGuides: VoteGuide[] = [
   {
-    id: "musicbank",
-    label: "뮤직뱅크",
+    id: "common",
+    label: "공통",
     assets: [
-      { type: "image", src: "/images/vote/뮤직뱅크/guide/팬캐스트.png", alt: "뮤직뱅크 팬캐스트 사전투표 가이드" },
+      { type: "image", src: "/images/vote/공통/01.음악방송_사전투표.jpg", alt: "음악방송 사전투표 공통 가이드" },
+      { type: "image", src: "/images/vote/공통/02.음악방송_반영비율.png", alt: "음악방송 반영비율 공통 가이드" },
     ],
   },
   {
@@ -25,6 +26,13 @@ export const voteGuides: VoteGuide[] = [
     label: "엠카운트다운",
     assets: [
       { type: "image", src: "/images/vote/엠카운트다운/guide/엠넷플러스.png", alt: "엠카운트다운 엠넷플러스 사전투표 가이드" },
+    ],
+  },
+  {
+    id: "musicbank",
+    label: "뮤직뱅크",
+    assets: [
+      { type: "image", src: "/images/vote/뮤직뱅크/guide/팬캐스트.png", alt: "뮤직뱅크 팬캐스트 사전투표 가이드" },
     ],
   },
   {
@@ -125,6 +133,29 @@ function buildStreamingParts(serviceId: string, serviceLabel: string): Streaming
  *   예) /images/cheering/who-are-you/guide/who-are-you.jpg
  */
 export const streamingGuideServices: StreamingGuideService[] = [
+  // 뮤직비디오: PCver, 모바일ver
+  {
+    id: "mv",
+    label: "뮤직비디오",
+    parts: [
+      {
+        id: "pcver",
+        label: "PCver",
+        assets: [
+          { type: "image", src: "/images/guides/뮤직비디오/PCver/PC.png", alt: "뮤직비디오 PCver 1" },
+          { type: "image", src: "/images/guides/뮤직비디오/PCver/PC2.png", alt: "뮤직비디오 PCver 2" },
+        ],
+      },
+      {
+        id: "mobilever",
+        label: "모바일ver",
+        assets: [
+          { type: "image", src: "/images/guides/뮤직비디오/모바일ver/모바일.png", alt: "뮤직비디오 모바일ver 1" },
+          { type: "image", src: "/images/guides/뮤직비디오/모바일ver/모바일2.png", alt: "뮤직비디오 모바일ver 2" },
+        ],
+      },
+    ],
+  },
   // 멜론, 지니, 벅스: 다운로드/기프트/ID생성 등 전체 가이드
   {
     id: "melon",

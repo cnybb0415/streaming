@@ -28,6 +28,17 @@ function toAbsoluteUrl(url: string): string {
   return `${base}${path}`;
 }
 
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+
+function secondsUntilNextKstTopOfHourPlusOneMin(now: Date): number {
+  const kstMs = now.getTime() + KST_OFFSET_MS;
+  const flooredKstMs = kstMs - (kstMs % (60 * 60 * 1000));
+  const nextKstMs = flooredKstMs + 60 * 60 * 1000 + 60 * 1000;
+  const utcMs = nextKstMs - KST_OFFSET_MS;
+  const diffMs = Math.max(0, utcMs - now.getTime());
+  return Math.max(60, Math.ceil(diffMs / 1000));
+}
+
 function isChartsData(value: unknown): value is ChartsData {
   if (!value || typeof value !== "object") return false;
   const data = value as { lastUpdated?: unknown; items?: unknown };
@@ -75,7 +86,8 @@ export async function getChartsData(): Promise<ChartsData> {
   const url = overrideUrl ? toAbsoluteUrl(overrideUrl) : toAbsoluteUrl("/api/charts");
 
   try {
-    const response = await fetch(url, { cache: "no-store" });
+    const revalidate = secondsUntilNextKstTopOfHourPlusOneMin(new Date());
+    const response = await fetch(url, { next: { revalidate } });
     if (!response.ok) return localCharts as ChartsData;
 
     const json = (await response.json()) as unknown;

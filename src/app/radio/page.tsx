@@ -3,7 +3,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { openSms } from "@/lib/sms";
-import { useEffect, useState } from "react";
 
 type ScheduleItem = { name: string; src: string };
 
@@ -18,26 +17,16 @@ const STATIONS = [
 ] as const;
 
 export default function RadioPage() {
-  const [items, setItems] = useState<ScheduleItem[]>([]);
-
-  useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch("/api/radio-schedule", { cache: "no-store" });
-        const data = (await res.json()) as { items?: ScheduleItem[] };
-        if (cancelled) return;
-        setItems(Array.isArray(data.items) ? data.items : []);
-      } catch {
-        if (cancelled) return;
-        setItems([]);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const fileNames = [
+    "01.라디오 신청 가이드.png",
+    "02.KBS.png",
+    "03.MBC.png",
+    "04.SBS.png",
+  ].sort((a, b) => a.localeCompare(b, "ko", { numeric: true }));
+  const items: ScheduleItem[] = fileNames.map((name) => ({
+    name,
+    src: `/images/radio/schedule/${encodeURIComponent(name)}`,
+  }));
 
   return (
     <div className="min-h-screen bg-transparent text-foreground">

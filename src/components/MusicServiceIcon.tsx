@@ -1,18 +1,18 @@
 import Image from "next/image";
 
-export type MusicServiceId = "melon" | "genie" | "bugs" | "flo" | "vibe" | "youtube";
+export type MusicServiceId = "melon" | "genie" | "bugs" | "flo" | "vibe" | "youtube" | "cheer";
 
 export function resolveMusicServiceIdFromLabel(label: string): MusicServiceId | null {
   const text = label.trim();
   if (!text) return null;
 
   if (text.includes("유튜브") || text.toLowerCase().includes("youtube")) return "youtube";
-
   if (text.includes("멜론") || text.toLowerCase().includes("melon")) return "melon";
   if (text.includes("지니") || text.toLowerCase().includes("genie")) return "genie";
   if (text.includes("벅스") || text.toLowerCase().includes("bugs")) return "bugs";
   if (text.includes("플로") || text.toLowerCase().includes("flo")) return "flo";
   if (text.includes("바이브") || text.toLowerCase().includes("vibe")) return "vibe";
+  if (text.includes("응원법") || text.toLowerCase().includes("cheer")) return "cheer";
 
   return null;
 }

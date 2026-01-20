@@ -5,7 +5,7 @@ import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 export const runtime = "nodejs";
-export const revalidate = 0;
+export const revalidate = 3600;
 
 type ProviderEntry = {
   rank?: unknown;
@@ -177,11 +177,12 @@ function hasDeprecatedPlaceholders(items: ChartItem[]): boolean {
 
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
 
-function getKstTopOfHourIso(now: Date): string {
-  // KST has a fixed UTC+9 offset (no DST). We compute the KST-local top-of-hour
-  // and convert back to an ISO timestamp.
+
+// 정각 1분 뒤(01분)에 갱신되도록 기준 시각을 조정
+function getKstTopOfHourPlusOneMinIso(now: Date): string {
+  // KST 기준, 정각 1분 뒤(01분)로 내림
   const kstMs = now.getTime() + KST_OFFSET_MS;
-  const flooredKstMs = kstMs - (kstMs % (60 * 60 * 1000));
+  const flooredKstMs = kstMs - (kstMs % (60 * 60 * 1000)) + 60 * 1000;
   const utcMs = flooredKstMs - KST_OFFSET_MS;
   return new Date(utcMs).toISOString();
 }
@@ -197,8 +198,8 @@ function getNextKstTopOfHour(now: Date): Date {
 function isStaleForHourlyRefresh(lastUpdatedIso: string, now: Date): boolean {
   const last = new Date(lastUpdatedIso);
   if (Number.isNaN(last.getTime())) return true;
-  // Refresh once we cross a new KST top-of-hour boundary.
-  return getKstTopOfHourIso(now) !== getKstTopOfHourIso(last);
+  // 정각 1분 뒤(01분) 기준으로 갱신
+  return getKstTopOfHourPlusOneMinIso(now) !== getKstTopOfHourPlusOneMinIso(last);
 }
 
 function pickTrackEntry(
@@ -234,7 +235,7 @@ async function fetchChartsAndPersist(
   const baseUrl = process.env.KOREA_MUSIC_CHART_API_BASE_URL;
   if (!baseUrl) {
     const data: ChartsData = {
-      lastUpdated: getKstTopOfHourIso(new Date()),
+      lastUpdated: getKstTopOfHourPlusOneMinIso(new Date()),
       items: [
         {
           label: "차트",
@@ -316,7 +317,7 @@ async function fetchChartsAndPersist(
   const items = results.filter((item): item is ChartItem => item !== null);
 
   const data: ChartsData = {
-    lastUpdated: getKstTopOfHourIso(new Date()),
+    lastUpdated: getKstTopOfHourPlusOneMinIso(new Date()),
     items,
   };
 
@@ -403,7 +404,7 @@ export async function GET(request: Request): Promise<Response> {
   } catch {
     // Keep the API shape stable even if something unexpected happens.
     const data: ChartsData = {
-      lastUpdated: getKstTopOfHourIso(new Date()),
+      lastUpdated: getKstTopOfHourPlusOneMinIso(new Date()),
       items: PLATFORM_DEFS.map((platform) => ({
         label: platform.label,
         status: "차트 연동 실패",

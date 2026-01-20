@@ -111,6 +111,15 @@ export const siteConfig = {
         "meloniphone://play/?ctype=1&menuid=0&cid=600691215,600691216,600691223,600691217,600691218,600691215,600691216,600691223,600691219,600691220,600691215,600691216,600691223,600691221,600691222,600691215,600691219,600691221,600691222",
     },
 
+    // 멜론: 웹/앱 공용 링크 (웹은 웹으로, 모바일은 앱으로)
+    {
+      id: "melon",
+      label: "멜론 뮤직웨이브",
+      iosHref: "https://into.melon.com/bridge/kakaotalk/musicwave/IIpiAqygEMGAm65tmszsBw?type=channel&t=1768917589576",
+      androidHref: "https://into.melon.com/bridge/kakaotalk/musicwave/IIpiAqygEMGAm65tmszsBw?type=channel&t=1768917589576",
+      webHref: "https://kko.to/TSpv-uFGYK",
+    },
+
     // 지니: OS별 링크
     {
       id: "genie",

@@ -90,7 +90,7 @@ export function OneClickStreamingGrid({
           >
             <span className="inline-flex items-center gap-2">
               <span className="inline-flex h-[18px] w-[18px] items-center justify-center">
-                <MusicServiceIcon label={link.label} size={18} className="h-[18px] w-[18px]" />
+                <MusicServiceIcon label={link.label} size={18} className="relative top-[3px] h-[18px] w-[18px]" />
               </span>
               <span className="whitespace-nowrap">{link.label}</span>
               {isTrulyUnavailable ? (

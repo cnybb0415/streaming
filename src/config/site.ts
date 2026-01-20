@@ -179,7 +179,7 @@ export const siteConfig = {
 
   contacts: {
     twitterUrl: "https://x.com/weareoneEXO",
-    instagramUrl: "https://www.instagram.com/weareone.exo?igsh=c2tybXIybHpmcmly",
+    instagramUrl: "https://www.instagram.com/weareone.exo",
     devEmail: "dev@example.com",
     teamEmail: "team@example.com",
   },

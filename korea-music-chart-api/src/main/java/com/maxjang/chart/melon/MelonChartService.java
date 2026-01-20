@@ -56,6 +56,7 @@ public class MelonChartService {
 
             String albumName = albumEl != null ? albumEl.text() : "";
             String albumArt = artEl != null ? artEl.attr("src") : "";
+            String[] rankStatus = resolveRankStatus(row);
 
             data.add(ChartVO.builder()
                     .rank(chartRank)
@@ -64,10 +65,62 @@ public class MelonChartService {
                     .albumName(albumName)
                     .albumArt(albumArt)
                     .songNumber(songNumber)
+                    .rankStatus(rankStatus[0])
+                    .changedRank(Integer.parseInt(rankStatus[1]))
                     .build());
         }
 
         return data;
+    }
+
+    private String[] resolveRankStatus(Element row) {
+        Element rankWrap = row.selectFirst(".rank_wrap");
+        if (rankWrap == null) {
+            return new String[] {"static", "0"};
+        }
+        Element icon = rankWrap.selectFirst(".bullet_icons");
+        String iconClass = icon != null ? icon.className() : "";
+
+        Element upValue = rankWrap.selectFirst("span.up");
+        Element downValue = rankWrap.selectFirst("span.down");
+        Element noneValue = rankWrap.selectFirst("span.none");
+
+        if (iconClass.contains("rank_up")) {
+            return new String[] {"up", String.valueOf(parseDelta(upValue != null ? upValue.text() : ""))};
+        }
+        if (iconClass.contains("rank_down")) {
+            return new String[] {"down", String.valueOf(parseDelta(downValue != null ? downValue.text() : ""))};
+        }
+        if (iconClass.contains("rank_new") || iconClass.contains("rank_re")) {
+            return new String[] {"new", "0"};
+        }
+        if (iconClass.contains("rank_static")) {
+            return new String[] {"static", "0"};
+        }
+
+        String text = rankWrap.text();
+        if (text.contains("상승")) {
+            return new String[] {"up", String.valueOf(parseDelta(text))};
+        }
+        if (text.contains("하락")) {
+            return new String[] {"down", String.valueOf(parseDelta(text))};
+        }
+        if (text.contains("순위 동일")) {
+            return new String[] {"static", "0"};
+        }
+        if (noneValue != null) {
+            return new String[] {"static", "0"};
+        }
+
+        return new String[] {"static", "0"};
+    }
+
+    private int parseDelta(String text) {
+        Matcher m = Pattern.compile("(\\d+)").matcher(text);
+        if (m.find()) {
+            return Integer.parseInt(m.group(1));
+        }
+        return 0;
     }
 
     // Get TOP100 Chart

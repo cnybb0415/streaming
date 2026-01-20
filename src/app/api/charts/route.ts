@@ -18,7 +18,14 @@ type ProviderEntry = {
 type ChartsCacheFile = {
   lastUpdated: string;
   fetchedAt?: string;
-  items: Array<{ label: string; status?: string; rank?: number; prevRank?: number }>;
+  items: Array<{
+    label: string;
+    status?: string;
+    rank?: number;
+    prevRank?: number;
+    rankStatus?: string;
+    changedRank?: number;
+  }>;
 };
 
 type PlatformDef = {
@@ -121,6 +128,8 @@ async function readChartsCache(): Promise<(ChartsData & { fetchedAt?: string }) 
         status: (i as { status?: unknown }).status as string | undefined,
         rank: (i as { rank?: unknown }).rank as number | undefined,
         prevRank: (i as { prevRank?: unknown }).prevRank as number | undefined,
+        rankStatus: (i as { rankStatus?: unknown }).rankStatus as string | undefined,
+        changedRank: (i as { changedRank?: unknown }).changedRank as number | undefined,
       }))
       .filter((i) => typeof i.label === "string" && i.label.trim().length > 0);
 
@@ -291,7 +300,16 @@ async function fetchChartsAndPersist(
           ? prevRankFromProvider
           : prevRankByLabel.get(platform.label);
 
-      results[index] = { label: platform.label, rank, prevRank };
+      const rankStatus = typeof match?.rankStatus === "string" ? match.rankStatus : undefined;
+      const changedRank = match ? toNumber(match.changedRank) : undefined;
+
+      results[index] = {
+        label: platform.label,
+        rank,
+        prevRank,
+        rankStatus,
+        changedRank,
+      };
     })
   );
 

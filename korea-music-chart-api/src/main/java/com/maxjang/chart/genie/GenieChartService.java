@@ -7,6 +7,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,48 +18,71 @@ import java.util.stream.Collectors;
 
 @Service
 public class GenieChartService {
-    // Get Top100 Chart
+    private static final ZoneId KST = ZoneId.of("Asia/Seoul");
+    private static final DateTimeFormatter GENIE_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
+    private static final DateTimeFormatter GENIE_HOUR = DateTimeFormatter.ofPattern("HH");
+
+    // Get Top200 Chart
     public List<ChartVO> getGenieChartTop100(String artistName) throws Exception {
-        String url1 = "https://www.genie.co.kr/chart/top200?rtm=Y&pg=1";
-        String url2 = "https://www.genie.co.kr/chart/top200?rtm=Y&pg=2";
-        Document doc1 = Jsoup.connect(url1).userAgent("Chrome").get();
-        Document doc2 = Jsoup.connect(url2).userAgent("Chrome").get();
-
-        List<String> artistNames = getTextsOfElements(doc1, "table .artist");
-        artistNames.addAll(getTextsOfElements(doc2, "table .artist"));
-
-        List<String> titles = getTextsOfElements(doc1, "table .title");
-        titles.addAll(getTextsOfElements(doc2, "table .title"));
-
-        List<String> albumNames = getTextsOfElements(doc1, "table .albumtitle");
-        albumNames.addAll(getTextsOfElements(doc2, "table .albumtitle"));
-
-        List<String> albumArts = getAttrsOfElements(doc1, "table .cover img", "src");
-        albumArts.addAll(getAttrsOfElements(doc2, "table .cover img", "src"));
-
-        List<String> songNumbers = getAttrsOfElements(doc1, "table tr[songid]", "songid");
-        songNumbers.addAll(getAttrsOfElements(doc2, "table tr[songid]", "songid"));
-
-        List<String> rankStatuses = getRankStatus(doc1);
-        rankStatuses.addAll(getRankStatus(doc2));
+        ZonedDateTime now = ZonedDateTime.now(KST);
+        String ymd = now.format(GENIE_DATE);
+        String hh = now.format(GENIE_HOUR);
 
         List<ChartVO> data = new ArrayList<>();
-        for (int i = 0; i < titles.size(); i++) {
-            String[] rank = rankStatuses.get(i).split(",");
-            if (artistName == null || artistNames.get(i).contains(artistName)) {
+        for (int page = 1; page <= 4; page++) {
+            String url =
+                    "https://www.genie.co.kr/chart/top200?ditc=D&rtm=Y&ymd=" + ymd + "&hh=" + hh + "&pg=" + page;
+            Document doc = fetchDocument(url);
+
+            for (Element row : doc.select("table.list-wrap tbody tr.list")) {
+                String songNumber = row.attr("songid");
+                String rankText = row.selectFirst("td.number") != null ? row.selectFirst("td.number").text() : "";
+                Integer rankValue = parseNumber(rankText);
+
+                Element titleEl = row.selectFirst("td.info a.title");
+                Element artistEl = row.selectFirst("td.info a.artist");
+                Element albumEl = row.selectFirst("td.info a.albumtitle");
+                Element artEl = row.selectFirst("td a.cover img");
+
+                String title = titleEl != null ? titleEl.text() : "";
+                String artist = artistEl != null ? artistEl.text() : "";
+                String albumName = albumEl != null ? albumEl.text() : "";
+                String albumArt = artEl != null ? artEl.attr("src") : "";
+                if (albumArt.startsWith("//")) {
+                    albumArt = "https:" + albumArt;
+                }
+
+                if (artistName != null && !artistName.isEmpty() && (artist == null || !artist.contains(artistName))) {
+                    continue;
+                }
+
+                String[] rankStatus = resolveRankStatus(row);
+
                 data.add(ChartVO.builder()
-                        .rank(i + 1)
-                        .artistName(artistNames.get(i))
-                        .title(titles.get(i))
-                        .albumName(albumNames.get(i))
-                        .albumArt("https://" + albumArts.get(i).split("//")[1])
-                        .songNumber(songNumbers.get(i))
-                        .rankStatus(rank[0])
-                        .changedRank(Integer.parseInt(rank[1]))
+                        .rank(rankValue != null ? rankValue : data.size() + 1)
+                        .artistName(artist)
+                        .title(title)
+                        .albumName(albumName)
+                        .albumArt(albumArt)
+                        .songNumber(songNumber)
+                        .rankStatus(rankStatus[0])
+                        .changedRank(Integer.parseInt(rankStatus[1]))
                         .build());
             }
         }
+
         return data;
+    }
+
+    private Document fetchDocument(String url) throws Exception {
+        return Jsoup.connect(url)
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+                .header("Accept-Language", "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7")
+                .header("Cache-Control", "no-cache")
+                .header("Pragma", "no-cache")
+                .referrer("https://www.genie.co.kr/")
+                .get();
     }
 
     // Get tag value
@@ -66,28 +92,34 @@ public class GenieChartService {
                 .collect(Collectors.toList());
     }
 
-    // Get RankStatus
-    private List<String> getRankStatus(Document doc) {
-        List<String> hasChangedList = new ArrayList<>();
-        for (Element element : doc.select("table span.rank>span.rank>span")) {
-            String className = element.className();
-            String text = element.ownText();
-            switch (className) {
-                case "rank-none":
-                    hasChangedList.add("static,0");
-                    break;
-                case "rank-up":
-                    hasChangedList.add("up," + text);
-                    break;
-                case "rank-down":
-                    hasChangedList.add("down," + text);
-                    break;
-                case "rank-new":
-                    hasChangedList.add("new,0"); // 진입
-                    break;
-            }
+    private String[] resolveRankStatus(Element row) {
+        Element statusEl = row.selectFirst("td.number span.rank span.rank-up, td.number span.rank span.rank-down, td.number span.rank span.rank-none, td.number span.rank span.rank-new, td.number span.rank span.rank-re");
+        if (statusEl == null) {
+            return new String[] {"static", "0"};
         }
-        return hasChangedList;
+
+        String className = statusEl.className();
+        String text = statusEl.text();
+
+        if (className.contains("rank-up")) {
+            return new String[] {"up", String.valueOf(parseNumber(text))};
+        }
+        if (className.contains("rank-down")) {
+            return new String[] {"down", String.valueOf(parseNumber(text))};
+        }
+        if (className.contains("rank-new") || className.contains("rank-re")) {
+            return new String[] {"new", "0"};
+        }
+        return new String[] {"static", "0"};
+    }
+
+    private Integer parseNumber(String text) {
+        if (text == null) return null;
+        Matcher m = Pattern.compile("(\\d+)").matcher(text);
+        if (m.find()) {
+            return Integer.parseInt(m.group(1));
+        }
+        return null;
     }
 
     // Get tag attribute values

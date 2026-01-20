@@ -38,7 +38,7 @@ const CARDS: CardDef[] = [
     id: "genie_top200",
     provider: "genie",
     providerLabel: "지니",
-    typeLabel: "TOP200",
+    typeLabel: "TOP200 (실시간)",
     matchLabels: ["지니", "지니 TOP200"],
   },
   {
@@ -98,8 +98,30 @@ function getRankText(item?: ChartItem): { primary: string; suffix?: string } {
   return { primary: "-" };
 }
 
-function getChange(rank?: number, prevRank?: number): { label: string; className: string } {
+function getChange(
+  rank?: number,
+  prevRank?: number,
+  rankStatus?: string,
+  changedRank?: number
+): { label: string; className: string } {
   if (typeof rank !== "number") return { label: "-", className: "text-neutral-400" };
+
+  const status = typeof rankStatus === "string" ? rankStatus.toLowerCase() : "";
+  const delta = typeof changedRank === "number" ? changedRank : undefined;
+
+  if (status === "up" && typeof delta === "number") {
+    return { label: `↑${delta}`, className: "text-red-500" };
+  }
+  if (status === "down" && typeof delta === "number") {
+    return { label: `↓${delta}`, className: "text-blue-500" };
+  }
+  if (status === "new") {
+    return { label: "NEW", className: "text-emerald-500" };
+  }
+  if (status === "static") {
+    return { label: "-", className: "text-neutral-400" };
+  }
+
   if (typeof prevRank !== "number" || prevRank === rank) {
     return { label: "-", className: "text-neutral-400" };
   }
@@ -118,6 +140,17 @@ function renderTypeLabel(typeLabel: string) {
     return (
       <span>
         HOT100 <span className="text-[10px] font-semibold text-neutral-400">({day})</span>
+      </span>
+    );
+  }
+
+  const realtimeMatch = typeLabel.match(/^(.*)\s+\((실시간)\)$/);
+  if (realtimeMatch) {
+    const base = realtimeMatch[1].trim();
+    const suffix = realtimeMatch[2];
+    return (
+      <span>
+        {base} <span className="text-[10px] font-semibold text-neutral-400">({suffix})</span>
       </span>
     );
   }
@@ -188,7 +221,7 @@ export function ChartSummaryGrid({
         {CARDS.map((card) => {
           const item = findItem(charts.items, card.matchLabels);
           const rankText = getRankText(item);
-          const change = getChange(item?.rank, item?.prevRank);
+          const change = getChange(item?.rank, item?.prevRank, item?.rankStatus, item?.changedRank);
 
           return (
             <div

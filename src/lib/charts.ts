@@ -5,6 +5,8 @@ export type ChartItem = {
   status?: string;
   rank?: number;
   prevRank?: number;
+  rankStatus?: string;
+  changedRank?: number;
 };
 
 export type ChartsData = {
@@ -38,6 +40,8 @@ function isChartsData(value: unknown): value is ChartsData {
       status?: unknown;
       rank?: unknown;
       prevRank?: unknown;
+      rankStatus?: unknown;
+      changedRank?: unknown;
     };
 
     if (typeof i.label !== "string") return false;
@@ -46,12 +50,23 @@ function isChartsData(value: unknown): value is ChartsData {
     const hasValidRank = i.rank === undefined || typeof i.rank === "number";
     const hasValidPrevRank =
       i.prevRank === undefined || typeof i.prevRank === "number";
+    const hasValidRankStatus =
+      i.rankStatus === undefined || typeof i.rankStatus === "string";
+    const hasValidChangedRank =
+      i.changedRank === undefined || typeof i.changedRank === "number";
 
     // Must have at least one displayable field.
     const hasAnyDisplay =
       typeof i.status === "string" || typeof i.rank === "number";
 
-    return hasValidStatus && hasValidRank && hasValidPrevRank && hasAnyDisplay;
+    return (
+      hasValidStatus &&
+      hasValidRank &&
+      hasValidPrevRank &&
+      hasValidRankStatus &&
+      hasValidChangedRank &&
+      hasAnyDisplay
+    );
   });
 }
 

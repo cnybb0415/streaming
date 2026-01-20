@@ -245,16 +245,16 @@ export function ChartSummaryGrid({
                 </div>
 
                 <div className="text-right">
-                  <p className="text-[16px] sm:text-xl font-extrabold tabular-nums leading-none">
+                  <p className="text-[12px] sm:text-xl font-extrabold tabular-nums leading-none">
                     {rankText.suffix ? (
-                      <>
-                        {rankText.primary}
-                        <span className="ml-0.5 sm:ml-1 text-[10px] sm:text-sm font-bold">
+                      <span className="inline-flex items-baseline gap-0.5">
+                        <span>{rankText.primary}</span>
+                        <span className="text-[8px] sm:text-sm font-bold">
                           {rankText.suffix}
                         </span>
-                      </>
+                      </span>
                     ) : (
-                      <span className="text-[10px] sm:text-sm font-semibold text-neutral-500">
+                      <span className="text-[8px] sm:text-sm font-semibold text-neutral-500">
                         {rankText.primary}
                       </span>
                     )}

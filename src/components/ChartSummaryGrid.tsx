@@ -235,10 +235,10 @@ export function ChartSummaryGrid({
                 <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
                   <ProviderIcon provider={card.provider} label={card.providerLabel} />
                   <div className="min-w-0">
-                    <p className="text-[11px] sm:text-sm font-bold leading-tight truncate">
+                    <p className="text-[11px] sm:text-sm font-bold leading-tight break-keep">
                       {card.providerLabel}
                     </p>
-                    <p className="mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs text-neutral-500 leading-tight truncate">
+                    <p className="mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs text-neutral-500 leading-tight break-keep">
                       {renderTypeLabel(card.typeLabel)}
                     </p>
                   </div>

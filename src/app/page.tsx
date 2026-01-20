@@ -199,20 +199,20 @@ export default async function Home() {
               href={siteConfig.contacts.twitterUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-medium text-foreground/70 hover:text-foreground"
+                className="text-sm font-medium text-foreground/70 hover:text-foreground"
             >
               X로 이동
             </a>
             </div>
             <div className="mt-4">
             {latestTweet ? (
-              <article className="rounded-xl border border-foreground/10 bg-white p-3 shadow-sm">
-                <div className="text-sm font-semibold">@{latestTweet.username}</div>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-foreground/90">
+              <article className="rounded-xl border border-white/10 bg-neutral-900 p-3 text-white shadow-sm">
+                <div className="text-sm font-semibold text-white/90">@{latestTweet.username}</div>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">
                   {latestTweet.text}
                 </p>
                 {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
-                  <div className="mt-3 overflow-hidden rounded-lg border border-foreground/10">
+                  <div className="mt-3 overflow-hidden rounded-lg border border-white/10">
                     <img
                       src={latestTweet.mediaUrl ?? latestTweet.previewImageUrl}
                       alt="X preview"
@@ -226,12 +226,12 @@ export default async function Home() {
                     href={latestTweet.previewUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 block text-xs text-sky-600 hover:text-sky-700"
+                    className="mt-2 block text-xs text-sky-300 hover:text-sky-200"
                   >
                     {latestTweet.previewUrl}
                   </a>
                 ) : null}
-                <div className="mt-3 flex items-center justify-between text-xs text-foreground/60">
+                <div className="mt-3 flex items-center justify-between text-xs text-white/60">
                   {latestTweet.createdAt ? (
                     <span>{new Date(latestTweet.createdAt).toLocaleString("ko-KR")}</span>
                   ) : (
@@ -241,7 +241,7 @@ export default async function Home() {
                     href={latestTweet.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="font-medium text-foreground/70 hover:text-foreground"
+                    className="font-medium text-white/80 hover:text-white"
                   >
                     게시물 보기
                   </a>

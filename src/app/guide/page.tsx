@@ -8,6 +8,7 @@ export default function GuidePage() {
       <div className="mt-6">
         <GuideTabs />
       </div>
+
     </main>
   );
 }

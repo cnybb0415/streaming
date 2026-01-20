@@ -160,8 +160,8 @@ function renderTypeLabel(typeLabel: string) {
 
 function ProviderIcon({ provider, label }: { provider: ProviderKey; label: string }) {
   return (
-    <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white shadow-sm border border-foreground/10">
-      <MusicServiceIcon service={provider} label={label} size={18} className="h-[18px] w-[18px]" />
+    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm border border-foreground/10 sm:h-8 sm:w-8">
+      <MusicServiceIcon service={provider} label={label} size={16} className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]" />
     </span>
   );
 }
@@ -217,7 +217,7 @@ export function ChartSummaryGrid({
         </div>
       </div>
 
-      <div className="mt-5 grid gap-4 sm:grid-cols-2">
+      <div className="mt-5 grid grid-cols-2 gap-1.5 sm:gap-4">
         {CARDS.map((card) => {
           const item = findItem(charts.items, card.matchLabels);
           const rankText = getRankText(item);
@@ -227,35 +227,44 @@ export function ChartSummaryGrid({
             <div
               key={card.id}
               className={cn(
-                "rounded-2xl border border-foreground/10 bg-white px-5 py-4 shadow-sm",
+                "rounded-xl border border-foreground/10 bg-white px-2.5 py-2.5 shadow-sm sm:rounded-2xl sm:px-5 sm:py-4",
                 "transition-colors hover:border-sky-300"
               )}
             >
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 min-w-0">
+              <div className="flex items-center justify-between gap-2 sm:gap-4">
+                <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
                   <ProviderIcon provider={card.provider} label={card.providerLabel} />
                   <div className="min-w-0">
-                    <p className="text-sm font-bold leading-none truncate">{card.providerLabel}</p>
-                    <p className="mt-1 text-xs text-neutral-500 leading-none truncate">
+                    <p className="text-[11px] sm:text-sm font-bold leading-tight truncate">
+                      {card.providerLabel}
+                    </p>
+                    <p className="mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs text-neutral-500 leading-tight truncate">
                       {renderTypeLabel(card.typeLabel)}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <p className="text-xl font-extrabold tabular-nums leading-none">
+                  <p className="text-[16px] sm:text-xl font-extrabold tabular-nums leading-none">
                     {rankText.suffix ? (
                       <>
                         {rankText.primary}
-                        <span className="ml-1 text-sm font-bold">{rankText.suffix}</span>
+                        <span className="ml-0.5 sm:ml-1 text-[10px] sm:text-sm font-bold">
+                          {rankText.suffix}
+                        </span>
                       </>
                     ) : (
-                      <span className="text-sm font-semibold text-neutral-500">
+                      <span className="text-[10px] sm:text-sm font-semibold text-neutral-500">
                         {rankText.primary}
                       </span>
                     )}
                   </p>
-                  <p className={cn("mt-1 text-xs font-semibold tabular-nums", change.className)}>
+                  <p
+                    className={cn(
+                      "mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs font-semibold tabular-nums",
+                      change.className
+                    )}
+                  >
                     {change.label}
                   </p>
                 </div>

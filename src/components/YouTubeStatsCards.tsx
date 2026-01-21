@@ -18,14 +18,26 @@ type YouTubeError = {
   upstreamStatus?: number;
 };
 
+const CLIENT_CACHE_TTL_MS = 5 * 60 * 1000;
+let cachedStats: { data: YouTubeStats; at: number } | null = null;
+let inFlight: Promise<YouTubeStats> | null = null;
+
 type State =
   | { status: "idle" | "loading" }
   | { status: "ready"; data: YouTubeStats }
   | { status: "error"; message: string };
 
 async function fetchYouTubeStats(signal?: AbortSignal): Promise<YouTubeStats> {
-  const response = await fetch("/api/youtube", { signal });
-  const json = (await response.json()) as unknown;
+  const now = Date.now();
+  if (cachedStats && now - cachedStats.at < CLIENT_CACHE_TTL_MS) {
+    return cachedStats.data;
+  }
+
+  if (inFlight) return inFlight;
+
+  inFlight = (async () => {
+    const response = await fetch("/api/youtube", { signal });
+    const json = (await response.json()) as unknown;
 
   if (!response.ok) {
     const err = json as YouTubeError;
@@ -40,12 +52,21 @@ async function fetchYouTubeStats(signal?: AbortSignal): Promise<YouTubeStats> {
     throw new Error(message);
   }
 
-  const data = json as Partial<YouTubeStats>;
-  return {
-    viewCount: Number(data.viewCount ?? 0),
-    likeCount: Number(data.likeCount ?? 0),
-    fetchedAt: typeof data.fetchedAt === "string" ? data.fetchedAt : "",
-  };
+    const data = json as Partial<YouTubeStats>;
+    const resolved = {
+      viewCount: Number(data.viewCount ?? 0),
+      likeCount: Number(data.likeCount ?? 0),
+      fetchedAt: typeof data.fetchedAt === "string" ? data.fetchedAt : "",
+    };
+    cachedStats = { data: resolved, at: Date.now() };
+    return resolved;
+  })();
+
+  try {
+    return await inFlight;
+  } finally {
+    inFlight = null;
+  }
 }
 
 export function YouTubeStatsCards({

@@ -29,6 +29,16 @@ public class VibeChartController {
         return new ResponseFormat<>(vibeChartService.getVibeChartTop100(artistName));
     }
 
+    @GetMapping("/chart/today")
+    public ResponseFormat<ChartVO> getVibeChartTodayTop300() throws Exception {
+        return new ResponseFormat<>(vibeChartService.getVibeChartTodayTop300(null));
+    }
+
+    @GetMapping("/chart/today/{artistName}")
+    public ResponseFormat<ChartVO> getVibeChartTodayTop300ByArtistName(@PathVariable String artistName) throws Exception {
+        return new ResponseFormat<>(vibeChartService.getVibeChartTodayTop300(artistName));
+    }
+
     @GetMapping("/albums/{artistName}")
     public ResponseFormat<DetailVO> getAlbums(@PathVariable String artistName) throws Exception {
         return new ResponseFormat<>(vibeChartService.getAlbums(artistName));

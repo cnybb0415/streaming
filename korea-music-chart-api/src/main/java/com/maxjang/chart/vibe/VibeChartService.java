@@ -12,10 +12,26 @@ import java.util.List;
 
 @Service
 public class VibeChartService {
-    // Get Top100 Chart
+    // Get Top100 Chart (Total)
     public List<ChartVO> getVibeChartTop100(String artistName) throws Exception {
-        String url = "https://apis.naver.com/vibeWeb/musicapiweb/vibe/v1/chart/track/total";
-        Document doc = Jsoup.connect(url).userAgent("Chrome").get();
+        return getVibeChart(artistName, "total", null, 100);
+    }
+
+    // Get Today Top100 Chart (up to 300)
+    public List<ChartVO> getVibeChartTodayTop300(String artistName) throws Exception {
+        return getVibeChart(artistName, "total", "DAY", 300);
+    }
+
+    private List<ChartVO> getVibeChart(String artistName, String chartKind, String chartType, int display) throws Exception {
+        StringBuilder url = new StringBuilder(
+                "https://apis.naver.com/vibeWeb/musicapiweb/vibe/v1/chart/track/" + chartKind
+        );
+        url.append("?start=1&display=").append(display);
+        if (chartType != null && !chartType.isEmpty()) {
+            url.append("&chartType=").append(chartType);
+        }
+
+        Document doc = Jsoup.connect(url.toString()).userAgent("Chrome").get();
         List<ChartVO> data = new ArrayList<>();
         for (Element element : doc.select("response > result > chart > items > tracks > track")) {
             String[] rank = getRankStatus(element).split(",");

@@ -60,7 +60,14 @@ const CARDS: CardDef[] = [
     provider: "vibe",
     providerLabel: "바이브",
     typeLabel: "국내 급상승",
-    matchLabels: ["바이브", "바이브 국내 급상승"],
+    matchLabels: ["바이브 국내 급상승"],
+  },
+  {
+    id: "vibe_today_top100",
+    provider: "vibe",
+    providerLabel: "바이브",
+    typeLabel: "오늘 TOP100",
+    matchLabels: ["바이브 오늘 TOP100"],
   },
 ];
 
@@ -254,7 +261,7 @@ export function ChartSummaryGrid({
                         </span>
                       </span>
                     ) : (
-                      <span className="text-[8px] sm:text-sm font-semibold text-neutral-500">
+                      <span className="text-[8px] sm:text-sm font-semibold text-neutral-500 whitespace-nowrap">
                         {rankText.primary}
                       </span>
                     )}

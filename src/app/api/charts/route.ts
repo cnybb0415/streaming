@@ -64,6 +64,10 @@ const PLATFORM_DEFS: PlatformDef[] = [
     label: "바이브 국내 급상승",
     buildEndpoint: (base, artist) => `${base}/vibe/chart/${encodeURIComponent(artist)}`,
   },
+  {
+    label: "바이브 오늘 TOP100",
+    buildEndpoint: (base, artist) => `${base}/vibe/chart/today/${encodeURIComponent(artist)}`,
+  },
 ];
 
 function extractEntries(json: unknown): ProviderEntry[] {

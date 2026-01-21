@@ -162,7 +162,7 @@ export const streamingGuideServices: StreamingGuideService[] = [
   {
     id: "melon",
     label: "멜론",
-    parts: buildStreamingParts("melon", "멜론").filter((part) => part.id !== "gift"),
+    parts: buildStreamingParts("melon", "멜론"),
   },
   {
     id: "genie",

@@ -45,7 +45,7 @@ async function fetchJson<T>(url: string, token: string): Promise<T> {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    next: { revalidate: 1800 },
+    next: { revalidate: 900 },
   });
 
   if (!res.ok) {
@@ -112,7 +112,7 @@ async function fetchLinkPreviewImage(url: string): Promise<string | undefined> {
     req.searchParams.set("screenshot", "true");
     if (apiKey) req.searchParams.set("apiKey", apiKey);
 
-    const res = await fetch(req.toString(), { next: { revalidate: 1800 } });
+    const res = await fetch(req.toString(), { next: { revalidate: 900 } });
     if (!res.ok) return undefined;
     const json = (await res.json()) as {
       status?: string;

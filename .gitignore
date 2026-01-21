@@ -45,3 +45,6 @@ next-env.d.ts
 
 # Spring backend build outputs
 korea-music-chart-api/target/
+
+# Spring backend backups
+korea-music-chart-api/backup/

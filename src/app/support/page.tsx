@@ -112,6 +112,25 @@ function MoneyIcon() {
   );
 }
 
+function XIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className={className}
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <path
+        d="M7 3h4.3l3.2 4.3L18.7 3H22l-5.6 7.1L22 21h-4.3l-3.7-5-3.9 5H2l6.6-8.3L3 3h4.3l3.5 4.7L14.3 3"
+        stroke="currentColor"
+        strokeWidth="1.4"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 function TileIcon({ icon, label, bgClassName }: { icon: SupportTile["icon"]; label: string; bgClassName: string }) {
   return (
     <div className={`grid h-10 w-10 place-items-center rounded-xl ${bgClassName}`} aria-hidden>
@@ -156,6 +175,19 @@ export default function SupportPage() {
     <div className="min-h-screen bg-transparent text-foreground">
       <main className="mx-auto w-full max-w-6xl px-3 py-10 sm:px-6 sm:py-14">
         <h1 className="text-xl font-semibold">서포트</h1>
+        <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-foreground/70">
+          <span>사이트 관련 문의 - exo.dev0408@gmail.com</span>
+          <span className="text-foreground/40">|</span>
+          <a
+            href="https://x.com/exo_dev0408"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-foreground/80 transition hover:text-foreground"
+          >
+            <XIcon className="h-4 w-4" />
+            <span>https://x.com/exo_dev0408</span>
+          </a>
+        </p>
 
         <Card className="mt-6">
           <CardContent>

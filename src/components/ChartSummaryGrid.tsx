@@ -71,7 +71,7 @@ const CARDS: CardDef[] = [
   },
 ];
 
-function formatKstTimestamp(iso: string): string {
+function formatKstTimestampTopOfHour(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "-";
 
@@ -81,7 +81,6 @@ function formatKstTimestamp(iso: string): string {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
-    minute: "2-digit",
     hour12: false,
   })
     .formatToParts(date)
@@ -90,7 +89,7 @@ function formatKstTimestamp(iso: string): string {
       return acc;
     }, {});
 
-  return `${parts.year}.${parts.month}.${parts.day} ${parts.hour}:${parts.minute} KST`;
+  return `${parts.year}.${parts.month}.${parts.day} ${parts.hour}:00`;
 }
 
 function findItem(items: ChartItem[], matchLabels: string[]): ChartItem | undefined {
@@ -208,7 +207,7 @@ export function ChartSummaryGrid({
   charts: ChartsData;
 }) {
   const safeTitle = trackTitle?.trim().length ? trackTitle.trim() : "노래제목";
-  const updated = formatKstTimestamp(charts.lastUpdated);
+  const updated = formatKstTimestampTopOfHour(charts.lastUpdated);
 
   return (
     <div>

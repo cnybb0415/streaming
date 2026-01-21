@@ -31,7 +31,7 @@ function getProviderKey(label: string): Exclude<ProviderKey, "all"> {
   return "other";
 }
 
-function formatKstTimestamp(iso: string): string {
+function formatKstTimestampTopOfHour(iso: string): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "-";
 
@@ -41,7 +41,6 @@ function formatKstTimestamp(iso: string): string {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
-    minute: "2-digit",
     hour12: false,
   })
     .formatToParts(date)
@@ -50,7 +49,7 @@ function formatKstTimestamp(iso: string): string {
       return acc;
     }, {});
 
-  return `${parts.year}.${parts.month}.${parts.day} ${parts.hour}:${parts.minute}`;
+  return `${parts.year}.${parts.month}.${parts.day} ${parts.hour}:00`;
 }
 
 function getRankChangeLabel(rank?: number, prevRank?: number): string {
@@ -142,7 +141,7 @@ export function ChartsPanel({ charts }: { charts: ChartsData }) {
     <div>
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-xs text-neutral-400">
-          업데이트: {formatKstTimestamp(charts.lastUpdated)} KST
+          업데이트: {formatKstTimestampTopOfHour(charts.lastUpdated)} KST
         </p>
       </div>
 

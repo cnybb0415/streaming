@@ -103,7 +103,7 @@ export type GuideAsset =
   | { type: "pdf"; href: string; label?: string };
 
 export type StreamingGuidePart = {
-  id: "streaming" | "signup" | "download" | "gift" | "pcver" | "mobilever";
+  id: "streaming" | "signup" | "download" | "gift" | "pcver" | "mobilever" | "mv";
   label: string;
   assets: GuideAsset[];
 };
@@ -140,7 +140,20 @@ const partFolderById: Record<StreamingGuidePart["id"], string> = {
   gift: "gift",
   pcver: "PC",
   mobilever: "모바일",
+  mv: "mv",
 };
+
+const buildMvPart = (serviceId: string, serviceLabel: string): StreamingGuidePart => ({
+  id: "mv",
+  label: "뮤직비디오 다운로드",
+  assets: [
+    {
+      type: "image",
+      src: guideImageSrc(serviceId, "mv", `${serviceId}_mv.png`),
+      alt: `${serviceLabel} 뮤직비디오 다운로드 가이드`,
+    },
+  ],
+});
 
 function buildStreamingParts(serviceId: string, serviceLabel: string): StreamingGuidePart[] {
   return defaultStreamingParts().map((part) => {
@@ -209,7 +222,7 @@ export const streamingGuideServices: StreamingGuideService[] = [
   {
     id: "melon",
     label: "멜론",
-    parts: buildStreamingParts("melon", "멜론"),
+    parts: [...buildStreamingParts("melon", "멜론"), buildMvPart("melon", "멜론")],
   },
   {
     id: "genie",
@@ -219,7 +232,24 @@ export const streamingGuideServices: StreamingGuideService[] = [
   {
     id: "bugs",
     label: "벅스",
-    parts: buildStreamingParts("bugs", "벅스").filter((part) => part.id !== "gift"),
+    parts: [...buildStreamingParts("bugs", "벅스").filter((part) => part.id !== "gift"), buildMvPart("bugs", "벅스")],
+  },
+  {
+    id: "kakao music",
+    label: "카카오뮤직",
+    parts: [
+      {
+        id: "download",
+        label: "음원 다운로드",
+        assets: [
+          {
+            type: "image",
+            src: guideImageSrc("kakao music", "download", "kakao_download.png"),
+            alt: "카카오 뮤직 음원 다운로드 가이드",
+          },
+        ],
+      },
+    ],
   },
   // 플로, 바이브: 스트리밍만 남김
   { id: "flo", label: "플로", parts: [buildStreamingParts("flo", "플로")[0]] },

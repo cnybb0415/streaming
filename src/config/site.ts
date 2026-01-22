@@ -71,6 +71,11 @@ export const siteConfig = {
       pcHref: "https://vibe.naver.com/artist/272211",
       mobileHref: "https://vibe.naver.com/artist/272211",
     },
+    {
+      label: "카카오뮤직",
+      pcHref: "https://music.kakao.com",
+      mobileHref: "https://music.kakao.com",
+    },
   ] as const,
 
   // 원클릭 스트리밍(앱 딥링크/유니버설 링크)을 서비스별 + OS별로 설정합니다.

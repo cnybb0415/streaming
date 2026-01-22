@@ -1,6 +1,6 @@
 import Image from "next/image";
 
-export type MusicServiceId = "melon" | "genie" | "bugs" | "flo" | "vibe" | "youtube" | "cheer";
+export type MusicServiceId = "melon" | "genie" | "bugs" | "flo" | "vibe" | "youtube" | "cheer" | "kakao music";
 
 export function resolveMusicServiceIdFromLabel(label: string): MusicServiceId | null {
   const text = label.trim();
@@ -12,6 +12,7 @@ export function resolveMusicServiceIdFromLabel(label: string): MusicServiceId | 
   if (text.includes("벅스") || text.toLowerCase().includes("bugs")) return "bugs";
   if (text.includes("플로") || text.toLowerCase().includes("flo")) return "flo";
   if (text.includes("바이브") || text.toLowerCase().includes("vibe")) return "vibe";
+  if (text.includes("카카오") || text.toLowerCase().includes("kakao")) return "kakao music";
   if (text.includes("응원법") || text.toLowerCase().includes("cheer")) return "cheer";
 
   return null;
@@ -35,7 +36,7 @@ export function MusicServiceIcon({
 
   return (
     <Image
-      src={`/images/icon/${resolved}.png`}
+      src={`/images/icon/${encodeURIComponent(resolved)}.png`}
       alt={alt}
       width={size}
       height={size}

@@ -113,18 +113,23 @@ function Assets({
   idKey,
   assets,
   emptyLines,
+  action,
 }: {
   title: string;
   idKey: string;
   assets: GuideAsset[];
   emptyLines: string[];
+  action?: React.ReactNode;
 }) {
   if (!assets.length) return <EmptyState title={title} lines={emptyLines} />;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{title}</CardTitle>
+        <div className="flex items-center justify-between gap-2">
+          <CardTitle>{title}</CardTitle>
+          {action ? <div className="shrink-0">{action}</div> : null}
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         {assets.map((asset, idx) => {
@@ -318,6 +323,7 @@ function VoteTabsWithSidebar() {
   };
   const guides = voteGuides;
   const defaultGuide = guides[0]?.id ?? "";
+  const inkigayoVoteHref = "https://app.linc.fan/31TL/01KF9VV0VVE7GNAN51SAWHRTT6";
   if (!guides.length) {
     return (
       <EmptyState
@@ -367,6 +373,23 @@ function VoteTabsWithSidebar() {
                 title={`사전투표 가이드 · ${guide.label}`}
                 idKey={`vote-${guide.id}`}
                 assets={guide.assets}
+                action={
+                  guide.id === "inkigayo" ? (
+                    <a href={inkigayoVoteHref} target="_blank" rel="noopener noreferrer">
+                      <Button size="sm" variant="outline">
+                        <span className="inline-flex items-center gap-2">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src="/images/vote/인기가요/logo/linc.png"
+                            alt="Linc"
+                            className="h-4 w-auto"
+                          />
+                          <span>-&gt;</span>
+                        </span>
+                      </Button>
+                    </a>
+                  ) : undefined
+                }
                 emptyLines={[
                   `1) 파일을 public/images/vote/${guide.label}/guide/ 아래에 넣기`,
                   `2) src/data/guides.ts 에서 voteGuides > ${guide.label} assets에 경로 추가`,

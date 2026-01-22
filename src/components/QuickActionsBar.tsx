@@ -1,6 +1,6 @@
 
 "use client";
-import { Zap, ShoppingBag, Radio, MessageSquare, Megaphone } from "lucide-react";
+import { Zap, ShoppingBag, Radio, MessageSquare, Megaphone, Vote } from "lucide-react";
 
 function IconBookClosed({ size = 18 }: { size?: number }) {
   return (
@@ -51,6 +51,7 @@ const actionIcons: Record<string, React.ReactNode> = {
   "생방송 문자투표": <MessageSquare size={18} />,
   "가이드": <IconBookClosed />,
   "응원법": <Megaphone size={18} />,
+  "음악방송 사전투표": <Vote size={18} />,
 };
 
 import * as React from "react";

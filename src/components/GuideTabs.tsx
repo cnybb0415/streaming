@@ -178,13 +178,10 @@ function StreamingServiceTabs({ service }: { service: StreamingGuideService }) {
       <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start">
         <div className="md:w-[220px] md:shrink-0 md:self-stretch">
           <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-semibold text-foreground/80">항목</CardTitle>
-            </CardHeader>
             <CardContent className="pt-0">
               <TabsList
                 aria-label={`${service.label} 항목`}
-                className="flex flex-nowrap items-center gap-1 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none md:flex-col md:items-stretch md:overflow-visible"
+                className="flex flex-nowrap items-center gap-1 overflow-x-auto rounded-none border-0 bg-transparent p-0 pt-4 shadow-none md:flex-col md:items-stretch md:overflow-visible"
               >
                 {service.parts.map((part) => (
                   <TabsTrigger
@@ -285,8 +282,8 @@ function VoteTabs() {
         >
           {guides.map((guide) => (
             <TabsTrigger key={guide.id} value={guide.id} variant="underline">
-              <span className="inline-flex items-center gap-2 whitespace-nowrap">
-                <span>{guide.label}</span>
+              <span className="inline-flex items-center gap-2 whitespace-nowrap leading-none">
+                <span className="leading-none">{guide.label}</span>
               </span>
             </TabsTrigger>
           ))}
@@ -312,7 +309,7 @@ function VoteTabs() {
 
 
 
-function VoteTabsWithSidebar() {
+export function VoteTabsWithSidebar() {
   // 프로그램별 로고 경로 매핑
   const logoMap: Record<string, string> = {
     musicbank: "/images/vote/뮤직뱅크/logo/뮤직뱅크_logo.png",
@@ -337,13 +334,10 @@ function VoteTabsWithSidebar() {
       <div className="mt-4 flex flex-col gap-4 md:flex-row md:items-start">
         <div className="md:w-[220px] md:shrink-0 md:self-stretch">
           <Card>
-            <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-semibold text-foreground/80">항목</CardTitle>
-            </CardHeader>
             <CardContent className="pt-0">
               <TabsList
                 aria-label="사전투표 프로그램"
-                className="flex flex-nowrap items-center gap-1 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none md:flex-col md:items-stretch md:overflow-visible"
+                className="flex flex-nowrap items-center gap-1 overflow-x-auto rounded-none border-0 bg-transparent p-0 pt-4 shadow-none md:flex-col md:items-stretch md:overflow-visible"
               >
                 {guides.map((guide) => (
                   <TabsTrigger
@@ -353,12 +347,16 @@ function VoteTabsWithSidebar() {
                     className="w-auto whitespace-nowrap md:w-full"
                   >
                     {guide.id !== "common" ? (
-                      <span className="inline-flex items-center gap-2">
-                        <img src={logoMap[guide.id]} alt={guide.label + ' 로고'} className="h-5 w-5" />
-                        <span>{guide.label}</span>
+                      <span className="inline-flex h-full items-center gap-2 leading-none">
+                        <img
+                          src={logoMap[guide.id]}
+                          alt={guide.label + " 로고"}
+                          className="h-5 w-5 shrink-0 block"
+                        />
+                        <span className="block leading-none">{guide.label}</span>
                       </span>
                     ) : (
-                      <span>{guide.label}</span>
+                      <span className="inline-flex h-full items-center leading-none">{guide.label}</span>
                     )}
                   </TabsTrigger>
                 ))}
@@ -373,23 +371,6 @@ function VoteTabsWithSidebar() {
                 title={`사전투표 가이드 · ${guide.label}`}
                 idKey={`vote-${guide.id}`}
                 assets={guide.assets}
-                action={
-                  guide.id === "inkigayo" ? (
-                    <a href={inkigayoVoteHref} target="_blank" rel="noopener noreferrer">
-                      <Button size="sm" variant="outline">
-                        <span className="inline-flex items-center gap-2">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img
-                            src="/images/vote/인기가요/logo/linc.png"
-                            alt="Linc"
-                            className="h-4 w-auto"
-                          />
-                          <span>-&gt;</span>
-                        </span>
-                      </Button>
-                    </a>
-                  ) : undefined
-                }
                 emptyLines={[
                   `1) 파일을 public/images/vote/${guide.label}/guide/ 아래에 넣기`,
                   `2) src/data/guides.ts 에서 voteGuides > ${guide.label} assets에 경로 추가`,
@@ -405,8 +386,7 @@ function VoteTabsWithSidebar() {
 }
 
 export function GuideTabs() {
-  // Move 사전투표 to the front, 뮤직비디오 to the end
-  const voteTab = { id: "vote", label: "사전투표", type: "vote" as const };
+  // Move 뮤직비디오 to the end
   const streamingTabs = streamingGuideServices.map((service) => ({
     id: service.id,
     label: service.label,
@@ -420,7 +400,7 @@ export function GuideTabs() {
     const [mvTab] = orderedStreamingTabs.splice(mvIndex, 1);
     orderedStreamingTabs = [...orderedStreamingTabs, mvTab];
   }
-  const allTabs = [voteTab, ...orderedStreamingTabs];
+  const allTabs = orderedStreamingTabs;
   const defaultTab = allTabs[0]?.id ?? "";
 
   return (
@@ -444,11 +424,7 @@ export function GuideTabs() {
       </div>
       {allTabs.map((tab) => (
         <TabsContent key={tab.id} value={tab.id}>
-          {tab.type === "streaming" ? (
-            <StreamingServiceTabs service={tab.service} />
-          ) : (
-            <VoteTabsWithSidebar />
-          )}
+          <StreamingServiceTabs service={tab.service} />
         </TabsContent>
       ))}
     </Tabs>

@@ -5,6 +5,53 @@ export type VoteGuide = {
   assets: GuideAsset[];
 };
 
+export type VoteAppLink = {
+  id: string;
+  label: string;
+  logoSrc?: string;
+  actions: Array<{
+    id: string;
+    label: string;
+    href?: string;
+  }>;
+};
+
+export const voteAppLinks: VoteAppLink[] = [
+  {
+    id: "showchampion",
+    label: "쇼챔피언",
+    logoSrc: "/images/vote/쇼챔피언/logo/쇼챔피언_logo.png",
+    actions: [{ id: "app", label: "투표하기" }],
+  },
+  {
+    id: "mcountdown",
+    label: "엠카운트다운",
+    logoSrc: "/images/vote/엠카운트다운/logo/엠카운트다운_logo.png",
+    actions: [{ id: "app", label: "투표하기" }],
+  },
+  {
+    id: "musicbank",
+    label: "뮤직뱅크",
+    logoSrc: "/images/vote/뮤직뱅크/logo/뮤직뱅크_logo.png",
+    actions: [{ id: "app", label: "투표하기" }],
+  },
+  {
+    id: "musiccore",
+    label: "음악중심",
+    logoSrc: "/images/vote/음악중심/logo/음악중심_logo.png",
+    actions: [{ id: "app", label: "투표하기" }],
+  },
+  {
+    id: "inkigayo",
+    label: "인기가요",
+    logoSrc: "/images/vote/인기가요/logo/인기가요_logo.png",
+    actions: [
+      { id: "link", label: "링크", href: "https://app.linc.fan/31TL/01KF9VV0VVE7GNAN51SAWHRTT6" },
+      { id: "higher", label: "하이어" },
+    ],
+  },
+];
+
 export const voteGuides: VoteGuide[] = [
   {
     id: "common",

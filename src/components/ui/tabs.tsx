@@ -124,23 +124,23 @@ export function TabsTrigger({
       onClick={() => setValue(value)}
       onKeyDown={onKeyDown}
       className={cn(
-        "inline-flex shrink-0 items-center justify-center text-sm whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20",
+        "inline-flex shrink-0 items-center justify-center text-sm leading-none whitespace-nowrap transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/20",
         variant === "pill" &&
-          "h-10 rounded-xl px-4 font-semibold",
+          "h-9 rounded-xl px-4 font-semibold",
         variant === "pill" &&
           (selected
             ? "bg-foreground text-background"
             : "bg-transparent text-foreground hover:bg-gray-50"),
 
         variant === "underline" &&
-          "h-10 rounded-none border-b-2 px-1 font-semibold",
+          "h-9 rounded-none border-b-2 px-1 font-semibold",
         variant === "underline" &&
           (selected
             ? "border-foreground text-foreground"
             : "border-transparent text-foreground/70 hover:text-foreground"),
 
         variant === "sidebar" &&
-          "h-10 w-full justify-start rounded-xl px-3 font-semibold",
+          "h-9 w-full justify-start rounded-xl px-3 font-semibold",
         variant === "sidebar" &&
           (selected
             ? "bg-gray-50 text-foreground"

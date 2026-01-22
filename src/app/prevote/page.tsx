@@ -26,12 +26,7 @@ export default function PrevotePage() {
                       "inline-flex h-6 items-center justify-center gap-1 whitespace-nowrap rounded-md border border-foreground/15 bg-white px-1.5 text-[10px] font-medium text-foreground shadow-sm transition-[background-color,border-color,box-shadow,color,transform] hover:border-foreground/35 hover:shadow-md" +
                       (hasHref ? "" : " pointer-events-none opacity-50");
 
-                    const content = (
-                      <span className="inline-flex items-center gap-1">
-                        <span>{action.label}</span>
-                        <span className="text-[10px]">-&gt;</span>
-                      </span>
-                    );
+                    const content = <span>{action.label}</span>;
 
                     return hasHref ? (
                       <a

@@ -76,7 +76,7 @@ export const voteAppLinks: VoteAppLink[] = [
         id: "app",
         label: "투표하기",
         androidHref:
-          "intent://applink.info/PTO2bgbSnS#Intent;scheme=mubeat;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.vlending.apps.mubeat;end;",
+          "intent://applink.info#Intent;scheme=mubeat;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.vlending.apps.mubeat;end;",
       },
     ],
   },

@@ -13,6 +13,9 @@ export type VoteAppLink = {
     id: string;
     label: string;
     href?: string;
+    iosHref?: string;
+    androidHref?: string;
+    webHref?: string;
   }>;
 };
 
@@ -21,25 +24,61 @@ export const voteAppLinks: VoteAppLink[] = [
     id: "showchampion",
     label: "쇼챔피언",
     logoSrc: "/images/vote/쇼챔피언/logo/쇼챔피언_logo.png",
-    actions: [{ id: "app", label: "투표하기" }],
+    actions: [
+      {
+        id: "app",
+        label: "투표하기",
+        iosHref:
+          "https://promo-web.idolchamp.com/app_proxy.html?deeplink=https%3A%2F%2Fapp.idolchamp.com%2Fopen%2Fvote%2F01KF5C4HGGN9K997CN27PJXAZE",
+        androidHref:
+          "intent://app.idolchamp.com/open/vote/01KF5C4HGGN9K997CN27PJXAZE#Intent;scheme=https;package=com.nwz.ichampclient;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end;",
+        webHref:
+          "https://promo-web.idolchamp.com/app_proxy.html?deeplink=https%3A%2F%2Fapp.idolchamp.com%2Fopen%2Fvote%2F01KF5C4HGGN9K997CN27PJXAZE",
+      },
+    ],
   },
   {
     id: "mcountdown",
     label: "엠카운트다운",
     logoSrc: "/images/vote/엠카운트다운/logo/엠카운트다운_logo.png",
-    actions: [{ id: "app", label: "투표하기" }],
+    actions: [
+      {
+        id: "app",
+        label: "투표하기",
+        href: "https://mnetplus.onelink.me/TRa8/t9zck1c1?custom_link_value=vote%2Fv2%2F69701d0818149e25f7f64a4b",
+        iosHref: "https://mnetplus.onelink.me/TRa8/t9zck1c1?custom_link_value=vote%2Fv2%2F69701d0818149e25f7f64a4b",
+        androidHref: "https://mnetplus.onelink.me/TRa8/t9zck1c1?custom_link_value=vote%2Fv2%2F69701d0818149e25f7f64a4b",
+        webHref: "https://mnetplus.onelink.me/TRa8/t9zck1c1?custom_link_value=vote%2Fv2%2F69701d0818149e25f7f64a4b",
+      },
+    ],
   },
   {
     id: "musicbank",
     label: "뮤직뱅크",
     logoSrc: "/images/vote/뮤직뱅크/logo/뮤직뱅크_logo.png",
-    actions: [{ id: "app", label: "투표하기" }],
+    actions: [
+      {
+        id: "app",
+        label: "투표하기",
+        href: "https://fancast.go.link/4sLS8",
+        iosHref: "https://fancast.go.link/4sLS8",
+        androidHref: "https://fancast.go.link/4sLS8",
+        webHref: "https://fancast.go.link/4sLS8",
+      },
+    ],
   },
   {
     id: "musiccore",
     label: "음악중심",
     logoSrc: "/images/vote/음악중심/logo/음악중심_logo.png",
-    actions: [{ id: "app", label: "투표하기" }],
+    actions: [
+      {
+        id: "app",
+        label: "투표하기",
+        androidHref:
+          "intent://applink.info/PTO2bgbSnS#Intent;scheme=mubeat;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;package=com.vlending.apps.mubeat;end;",
+      },
+    ],
   },
   {
     id: "inkigayo",
@@ -47,7 +86,7 @@ export const voteAppLinks: VoteAppLink[] = [
     logoSrc: "/images/vote/인기가요/logo/인기가요_logo.png",
     actions: [
       { id: "link", label: "링크", href: "https://app.linc.fan/31TL/01KF9VV0VVE7GNAN51SAWHRTT6" },
-      { id: "higher", label: "하이어" },
+      { id: "higher", label: "하이어", href: "https://myhigher.chottu.link/UGgDXQ" },
     ],
   },
 ];

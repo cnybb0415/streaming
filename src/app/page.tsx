@@ -88,6 +88,7 @@ function XIcon() {
   );
 }
 
+
 export default async function Home() {
   const charts = await getChartsData();
   const latestTweet = await getLatestTweet();
@@ -175,6 +176,17 @@ export default async function Home() {
                 >
                   <SocialIcon>
                     <XIcon />
+                  </SocialIcon>
+                </a>
+                <a
+                  href="https://kwangya119.smtown.com/fake-list"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="광야119 허위정보 신고"
+                  className="text-foreground/80 hover:text-foreground"
+                >
+                  <SocialIcon>
+                    <img src="/images/icon/siren.png" alt="" className="h-[18px] w-[18px]" />
                   </SocialIcon>
                 </a>
               </div>

@@ -179,7 +179,7 @@ export default async function Home() {
                   </SocialIcon>
                 </a>
                 <a
-                  href="https://kwangya119.smtown.com/fake-list"
+                  href="https://kwangya119.smtown.com/"
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="광야119 허위정보 신고"

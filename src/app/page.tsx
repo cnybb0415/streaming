@@ -131,6 +131,14 @@ export default async function Home() {
             />
 
             <div className="mt-8 w-full max-w-md">
+              <a
+                href="/kwangya119"
+                className="mb-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-foreground/15 bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:border-foreground/35 hover:shadow-md"
+                aria-label="광야 119 신고하기"
+              >
+                <img src="/images/icon/siren.png" alt="" className="h-4 w-4" />
+                <span>KWANGYA 119 신고하기</span>
+              </a>
               <QuickActionsBar
                 actions={siteConfig.actions}
                 albumLinks={siteConfig.albumPurchaseLinks}

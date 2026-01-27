@@ -60,7 +60,7 @@ function ImageCarousel({ images }: { images: string[] }) {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-black/80">
+    <div className="relative overflow-hidden rounded-2xl bg-white">
       <div
         className="flex transition-transform duration-300 ease-out"
         style={{ transform: `translateX(-${index * 100}%)` }}
@@ -71,7 +71,7 @@ function ImageCarousel({ images }: { images: string[] }) {
             <img
               src={src}
               alt="광야119 안내"
-              className="mx-auto h-auto w-full max-w-[88%] object-contain"
+              className="h-auto w-full object-cover"
               loading="lazy"
             />
           </div>
@@ -118,7 +118,7 @@ export default function Kwangya119Page() {
     <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">광야 119 신고하기</h1>
+          <h1 className="text-2xl font-bold">KWANGYA 119 신고하기</h1>
           <p className="mt-2 text-sm text-foreground/70">
             허위정보/악성 게시물 신고는 아래 버튼을 눌러 진행해주세요.
           </p>
@@ -133,7 +133,7 @@ export default function Kwangya119Page() {
           className="inline-flex items-center justify-center gap-2 rounded-2xl border border-foreground/15 bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:border-foreground/35 hover:shadow-md"
         >
           <img src="/images/icon/siren.png" alt="" className="h-4 w-4" />
-          <span>광야119 신고하러 가기</span>
+          <span>KWANGYA 119 신고하러 가기</span>
         </a>
       </div>
 
@@ -141,7 +141,7 @@ export default function Kwangya119Page() {
         <div className="mt-8 mb-6">
           <TabsList aria-label="광야119 탭" className="justify-center">
             <TabsTrigger value="pdf" variant="pill">
-              PDF 따기
+              PDF 파일 생성
             </TabsTrigger>
             <TabsTrigger value="report" variant="pill">
               KWANGYA 119 신고하기
@@ -150,7 +150,7 @@ export default function Kwangya119Page() {
         </div>
 
         <TabsContent value="pdf" className="mt-0">
-          <section className="rounded-2xl border border-foreground/10 bg-[#0b0d12] p-4 shadow-sm">
+          <section className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
             <Tabs defaultValue="ios">
               <div className="mb-4">
                 <TabsList aria-label="PDF 이미지 탭" className="justify-center">
@@ -169,19 +169,35 @@ export default function Kwangya119Page() {
               <TabsContent value="ios" className="mt-0">
                 <ImageCarousel images={kwangyaIosImages} />
                 <div className="mt-6 rounded-2xl border border-foreground/10 bg-white p-6 text-sm text-foreground/70">
-                  사파리 ➡️ 오른쪽 하단 점세개 ➡️ 공유 ➡️ 옵션 ➡️ PDF ➡️ 파일저장 ➡️ 저장
+                  <ul className="list-decimal space-y-1 pl-5">
+                    <li>사파리 사용</li>
+                    <li>오른쪽 하단 점세개</li>
+                    <li>공유 ➡️ 옵션 ➡️ PDF ➡️ 파일저장</li>
+                    <li>저장</li>
+                  </ul>
                 </div>
               </TabsContent>
               <TabsContent value="android" className="mt-0">
                 <ImageCarousel images={kwangyaAndroidImages} />
                 <div className="mt-6 rounded-2xl border border-foreground/10 bg-white p-6 text-sm text-foreground/70">
-                  삼성 인터넷 ➡️ 오른쪽 하단 줄 세 개 ➡️ 인쇄/PDF ➡️ 노란색 PDF 클릭 ➡️ 파일 저장
+                  <ul className="list-decimal space-y-1 pl-5">
+                    <li>삼성 인터넷 사용</li>
+                    <li>오른쪽 하단 줄 세 개 클릭</li>
+                    <li>인쇄/PDF ➡️ 노란색 PDF 클릭</li>
+                    <li>파일 저장</li>
+                  </ul>
                 </div>
               </TabsContent>
               <TabsContent value="pc" className="mt-0">
                 <ImageCarousel images={kwangyaPcImages} />
                 <div className="mt-6 rounded-2xl border border-foreground/10 bg-white p-6 text-sm text-foreground/70">
-                  크롬 ➡️ 오른쪽 상단 점 세개 ➡️ 인쇄 ➡️ PDF로 저장 ➡️ 가로모드 ➡️ 설정더보기 - 배경그래픽 체크 ➡️ 준비한 파일에 저장
+                  <ul className="list-decimal space-y-1 pl-5">
+                    <li>크롬 사용</li>
+                    <li>오른쪽 상단 점 세개 클릭</li>
+                    <li>인쇄 ➡️ PDF로 저장 ➡️ 가로모드</li>
+                    <li>설정더보기 - 배경그래픽 체크</li>
+                    <li>준비한 파일에 저장</li>
+                  </ul>
                 </div>
               </TabsContent>
             </Tabs>
@@ -189,14 +205,19 @@ export default function Kwangya119Page() {
         </TabsContent>
 
         <TabsContent value="report" className="mt-0">
-          <section className="rounded-2xl border border-foreground/10 bg-[#0b0d12] p-4 shadow-sm">
+          <section className="rounded-2xl border border-foreground/10 bg-white p-4 shadow-sm">
             <ImageCarousel images={kwangyaReportImages} />
           </section>
 
           <section className="mt-6 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
             <div className="text-base font-semibold">광야 신고 방법</div>
             <div className="mt-2 text-sm text-foreground/70">
-              광야 접속 ➡️ SM아이디 로그인 ➡️ 제보,신고센터 ➡️ 아티스트 선택, 내용 작성 ➡️ 준비한 자료들 업로드(링크, PDF 등) ➡️ 제출
+              <ul className="list-decimal space-y-1 pl-5">
+                <li>광야 접속</li>
+                <li>SM아이디 로그인</li>
+                <li>제보,신고센터 ➡️ 아티스트 선택, 내용 작성 ➡️ 준비한 자료들 업로드(링크, PDF 등)</li>
+                <li>제출</li>
+              </ul>
             </div>
           </section>
         </TabsContent>

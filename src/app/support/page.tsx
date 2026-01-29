@@ -179,13 +179,13 @@ export default function SupportPage() {
           <span>사이트 관련 문의 - exo.dev0408@gmail.com</span>
           <span className="text-foreground/40">|</span>
           <a
-            href="https://x.com/exo_dev0408"
+            href="https://x.com/EXOREBIRTH_DEV"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-foreground/80 transition hover:text-foreground"
           >
             <XIcon className="h-4 w-4" />
-            <span>https://x.com/exo_dev0408</span>
+            <span>https://x.com/EXOREBIRTH_DEV</span>
           </a>
         </p>
 

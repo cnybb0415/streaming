@@ -183,7 +183,7 @@ export default function TourPage() {
   return (
     <main className="mx-auto w-full max-w-6xl px-3 py-10 sm:px-6 sm:py-14">
       <div className="flex flex-col gap-2">
-        <h1 className="text-2xl font-bold">투어일정</h1>
+        <h1 className="text-2xl font-bold">투어 일정</h1>
         <p className="text-sm text-foreground/70">
           2026 EXO PLANET #6 - EXhOrizon TOUR
         </p>

@@ -137,7 +137,10 @@ async function resolveUserId(username: string, token: string): Promise<string> {
 
 export async function getLatestTweet(): Promise<LatestTweet | null> {
   const token = getBearerToken();
-  if (!token) return null;
+  if (!token) {
+    console.warn("X API: missing bearer token");
+    return null;
+  }
 
   const username = (process.env.X_USERNAME || "weareoneEXO").trim();
   const userIdFromEnv = process.env.X_USER_ID?.trim();
@@ -167,7 +170,13 @@ export async function getLatestTweet(): Promise<LatestTweet | null> {
     return null;
   }
   const tweet = json.data?.[0];
-  if (!tweet) return null;
+  if (!tweet) {
+    console.warn("X API: no tweets returned", {
+      count: json.data?.length ?? 0,
+      username,
+    });
+    return null;
+  }
 
   const mediaKeys = tweet.attachments?.media_keys ?? [];
   const media = json.includes?.media ?? [];

@@ -155,21 +155,37 @@ export async function getLatestTweet(): Promise<LatestTweet | null> {
     return null;
   }
 
-  const url = new URL(`${API_BASE}/users/${userId}/tweets`);
-  url.searchParams.set("max_results", "5");
-  url.searchParams.set("exclude", "replies,retweets");
-  url.searchParams.set("tweet.fields", "created_at,attachments");
-  url.searchParams.set("expansions", "attachments.media_keys");
-  url.searchParams.set("media.fields", "url,preview_image_url,type");
+  const buildTweetsUrl = (excludeReplies: boolean) => {
+    const url = new URL(`${API_BASE}/users/${userId}/tweets`);
+    url.searchParams.set("max_results", "5");
+    if (excludeReplies) {
+      url.searchParams.set("exclude", "replies,retweets");
+    }
+    url.searchParams.set("tweet.fields", "created_at,attachments");
+    url.searchParams.set("expansions", "attachments.media_keys");
+    url.searchParams.set("media.fields", "url,preview_image_url,type");
+    return url.toString();
+  };
 
   let json: XTweetsResponse;
   try {
-    json = await fetchJson<XTweetsResponse>(url.toString(), token);
+    json = await fetchJson<XTweetsResponse>(buildTweetsUrl(true), token);
   } catch (error) {
     console.error("X API: failed to fetch tweets", error);
     return null;
   }
-  const tweet = json.data?.[0];
+
+  let tweet = json.data?.[0];
+  if (!tweet) {
+    try {
+      json = await fetchJson<XTweetsResponse>(buildTweetsUrl(false), token);
+      tweet = json.data?.[0];
+    } catch (error) {
+      console.error("X API: failed to fetch tweets (fallback)", error);
+      return null;
+    }
+  }
+
   if (!tweet) {
     console.warn("X API: no tweets returned", {
       count: json.data?.length ?? 0,

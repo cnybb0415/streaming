@@ -242,7 +242,8 @@ export default function TourPage() {
 
                   <div className="mt-2 grid grid-cols-7 gap-1 text-center text-sm">
                     {cells.map((day, cellIndex) => {
-                      const isWeekend = cellIndex % 7 === 0 || cellIndex % 7 === 6;
+                      const isSunday = cellIndex % 7 === 0;
+                      const isSaturday = cellIndex % 7 === 6;
                       const dateKey = day
                         ? toDateKey(year, monthItem.month, day)
                         : null;
@@ -260,7 +261,9 @@ export default function TourPage() {
                           className={
                             "relative flex h-9 items-center justify-center rounded-lg border border-foreground/5 text-sm transition" +
                             (day ? " bg-foreground/5" : " bg-transparent") +
-                            (isWeekend ? " text-rose-500" : " text-foreground/80") +
+                            (isSunday ? " text-rose-500" : "") +
+                            (isSaturday ? " text-blue-500" : "") +
+                            (!isSunday && !isSaturday ? " text-foreground/80" : "") +
                             (isSelected ? " ring-2 ring-foreground/30" : "") +
                             (day ? " hover:bg-foreground/10" : "")
                           }
@@ -268,11 +271,11 @@ export default function TourPage() {
                         >
                           {day ?? ""}
                           {hasEvent && day ? (
-                            <span className="absolute right-1 top-1">
+                            <span className="absolute right-0.5 top-0.5 sm:right-1 sm:top-1">
                               <svg
                                 viewBox="0 0 24 24"
                                 aria-hidden="true"
-                                className="h-4 w-4 text-rose-500"
+                                className="h-3.5 w-3.5 text-rose-500 sm:h-4 sm:w-4"
                                 fill="currentColor"
                               >
                                 <path d="M12 2c-3.314 0-6 2.686-6 6 0 4.5 6 12 6 12s6-7.5 6-12c0-3.314-2.686-6-6-6zm0 8.2a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4z" />

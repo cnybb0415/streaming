@@ -88,7 +88,7 @@ export async function FanchantSongGrid({
         return (
           <Link
             key={song.id}
-            href={`${hrefBase}/${encodeURIComponent(song.id)}`}
+            href={`${hrefBase}/${encodeURIComponent(song.slug)}`}
             className="block"
           >
             {card}

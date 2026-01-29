@@ -26,6 +26,16 @@ function stripLeadingNumber(name: string): string {
   return name.replace(/^\s*\d{1,3}\s*[.\-_\s]+/, "").trim();
 }
 
+function toSlug(name: string): string {
+  return stripLeadingNumber(name)
+    .replace(/[.]/g, "")
+    .replace(/[()]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim()
+    .toLowerCase();
+}
+
 export type CheeringSongAsset = {
   type: "image";
   src: string;
@@ -34,6 +44,7 @@ export type CheeringSongAsset = {
 
 export type CheeringSong = {
   id: string; // folder name under public/images/cheering
+  slug: string;
   label: string;
   order: number | null;
   coverSrc: string | null;
@@ -63,6 +74,7 @@ export async function getCheeringSongs(): Promise<CheeringSong[]> {
     dirs.map(async (dirName) => {
       const order = parseLeadingNumber(dirName);
       const label = stripLeadingNumber(dirName) || dirName;
+      const slug = toSlug(dirName);
 
       const albumArtDir = path.join(rootDir, dirName, "album-art");
       const guideDir = path.join(rootDir, dirName, "guide");
@@ -89,6 +101,7 @@ export async function getCheeringSongs(): Promise<CheeringSong[]> {
 
       return {
         id: dirName,
+        slug,
         label,
         order,
         coverSrc,
@@ -124,5 +137,5 @@ export async function getCheeringSongById(id: string): Promise<CheeringSong | nu
     // ignore
   }
 
-  return songs.find((s) => s.id === decoded) ?? null;
+  return songs.find((s) => s.slug === decoded) ?? null;
 }

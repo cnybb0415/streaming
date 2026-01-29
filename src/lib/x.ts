@@ -36,8 +36,10 @@ const API_BASE = "https://api.x.com/2";
 const MICROLINK_API = "https://api.microlink.io";
 
 function getBearerToken() {
-  const token = process.env.X_BEARER_TOKEN?.trim();
-  return token && token.length > 0 ? token : undefined;
+  const raw = process.env.X_BEARER_TOKEN?.trim();
+  if (!raw) return undefined;
+  const token = raw.startsWith("Bearer ") ? raw.slice(7).trim() : raw;
+  return token.length > 0 ? token : undefined;
 }
 
 async function fetchJson<T>(url: string, token: string): Promise<T> {
@@ -145,7 +147,8 @@ export async function getLatestTweet(): Promise<LatestTweet | null> {
     userId = userIdFromEnv && userIdFromEnv.length > 0
       ? userIdFromEnv
       : await resolveUserId(username, token);
-  } catch {
+  } catch (error) {
+    console.error("X API: failed to resolve user id", error);
     return null;
   }
 
@@ -159,7 +162,8 @@ export async function getLatestTweet(): Promise<LatestTweet | null> {
   let json: XTweetsResponse;
   try {
     json = await fetchJson<XTweetsResponse>(url.toString(), token);
-  } catch {
+  } catch (error) {
+    console.error("X API: failed to fetch tweets", error);
     return null;
   }
   const tweet = json.data?.[0];

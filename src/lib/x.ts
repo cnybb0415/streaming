@@ -16,6 +16,9 @@ type XTweetsResponse = {
     created_at?: string;
     attachments?: { media_keys?: string[] };
   }>;
+  meta?: {
+    result_count?: number;
+  };
   includes?: {
     media?: XMedia[];
   };
@@ -42,12 +45,17 @@ function getBearerToken() {
   return token.length > 0 ? token : undefined;
 }
 
-async function fetchJson<T>(url: string, token: string): Promise<T> {
+async function fetchJson<T>(
+  url: string,
+  token: string,
+  options?: { revalidate?: number; cache?: RequestCache },
+): Promise<T> {
   const res = await fetch(url, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
-    next: { revalidate: 900 },
+    cache: options?.cache,
+    next: { revalidate: options?.revalidate ?? 900 },
   });
 
   if (!res.ok) {
@@ -184,11 +192,25 @@ export async function getLatestTweet(): Promise<LatestTweet | null> {
       console.error("X API: failed to fetch tweets (fallback)", error);
       return null;
     }
+
+    if (!tweet) {
+      try {
+        json = await fetchJson<XTweetsResponse>(buildTweetsUrl(false), token, {
+          revalidate: 0,
+          cache: "no-store",
+        });
+        tweet = json.data?.[0];
+      } catch (error) {
+        console.error("X API: failed to fetch tweets (no-cache retry)", error);
+        return null;
+      }
+    }
   }
 
   if (!tweet) {
     console.warn("X API: no tweets returned", {
       count: json.data?.length ?? 0,
+      resultCount: json.meta?.result_count,
       username,
     });
     return null;

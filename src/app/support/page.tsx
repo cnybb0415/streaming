@@ -227,7 +227,7 @@ export default function SupportPage() {
                 {activeTile.id === "team" && (
                   <div className="mt-4 flex justify-end">
                     <a
-                      href="https://x.com/EXO_REBIRTH"
+                      href="https://forms.gle/RJkvhCtmtZqBSW64A"
                       target="_blank"
                       rel="noopener noreferrer"
                     >
